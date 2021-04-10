@@ -2,15 +2,13 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
 
-import 'produit_api.dart';
+import 'courses_api.dart';
+import 'mapdb.dart';
 
 Future<void> main() async {
+  db = MapDb('bin/courses.json');
   final api = Router();
-  api.mount('/films/', FilmApi().router);
-  api.get('/<name|.*>', (Request request, String name) {
-    final param = name.isNotEmpty ? name : 'World';
-    return Response.ok('Hello $param!\r\n');
-  });
+  api.mount('/courses/', CoursesApi().router);
 
   // TODO: Add CorsHeaders with a middleware
   var handler = const Pipeline().addMiddleware(logRequests()).addHandler(api);

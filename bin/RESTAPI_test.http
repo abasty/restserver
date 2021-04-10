@@ -1,5 +1,1 @@
-GET http://localhost:8083/alain
-###
-GET http://localhost:8083/films/
-###
-GET http://localhost:8083/films/10
+GET http://localhost:8083/courses/
