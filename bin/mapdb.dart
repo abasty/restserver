@@ -6,8 +6,10 @@ class MapDb {
   final String _name;
   final Map<String, dynamic> data = {};
   MapDb(this._name) {
-    data.addAll(
-        json.decode(File(_name).readAsStringSync()) as Map<String, dynamic>);
+    var str = File(_name).readAsStringSync();
+    final map = json.decode(str) as Map<String, dynamic>;
+    str = map['modele'] as String;
+    data.addAll(json.decode(str) as Map<String, dynamic>);
   }
 }
 

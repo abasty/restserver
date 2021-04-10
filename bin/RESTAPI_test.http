@@ -1,1 +1,5 @@
-GET http://localhost:8083/courses/
+GET http://localhost:8083/courses/all
+###
+GET http://localhost:8083/courses/rayons
+###
+GET http://localhost:8083/courses/produits

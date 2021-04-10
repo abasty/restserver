@@ -9,8 +9,18 @@ class CoursesApi {
   Router get router {
     final router = Router();
 
-    router.get('/', (Request request) {
+    router.get('/all', (Request request) {
       return Response.ok(json.encode(db.data),
+          headers: {'Content-Type': 'application/json'});
+    });
+
+    router.get('/rayons', (Request request) {
+      return Response.ok(json.encode(db.data['rayons']),
+          headers: {'Content-Type': 'application/json'});
+    });
+
+    router.get('/produits', (Request request) {
+      return Response.ok(json.encode(db.data['produits']),
           headers: {'Content-Type': 'application/json'});
     });
 
