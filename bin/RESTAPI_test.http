@@ -1,5 +1,5 @@
-GET http://localhost:8083/courses/all
+GET http://localhost:8067/courses/all
 ###
-GET http://localhost:8083/courses/rayons
+GET http://localhost:8067/courses/rayons
 ###
-GET http://localhost:8083/courses/produits
+GET http://localhost:8067/courses/produits

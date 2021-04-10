@@ -14,7 +14,7 @@ Future<void> main() async {
   var handler = const Pipeline().addMiddleware(logRequests()).addHandler(api);
 
   print('Launching API server');
-  await io.serve(handler, 'localhost', 8083);
+  await io.serve(handler, 'localhost', 8067);
 }
 
 // void addCorsHeaders(HttpResponse response) {
