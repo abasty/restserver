@@ -2,11 +2,11 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
 
-import 'courses_api.dart';
-import 'mapdb.dart';
+import 'package:restserver/courses_api.dart';
+import 'package:restserver/mapdb.dart';
 
 Future<void> main() async {
-  db = MapDb('bin/courses.json');
+  db = MapDb('assets/courses.json');
   final api = Router();
   api.mount('/courses/', CoursesApi().router);
 
