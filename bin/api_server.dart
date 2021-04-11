@@ -1,8 +1,9 @@
-import 'dart:convert';
+// import 'dart:convert';
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:sse/server/sse_handler.dart';
 
 import 'package:restserver/courses_api.dart';
@@ -16,6 +17,7 @@ Future<void> main() async {
 
   var handler = Cascade().add(sse).add(api).handler;
 
+  // ignore: todo
   // TODO: Add CorsHeaders with a middleware
   var server =
       const Pipeline().addMiddleware(logRequests()).addHandler(handler);
