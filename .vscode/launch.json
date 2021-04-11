@@ -8,6 +8,7 @@
             "name": "restserver",
             "request": "launch",
             "type": "dart",
+            "vmAdditionalArgs": ["--no-sound-null-safety"],
             "program": "bin/api_server.dart"
         }
     ]

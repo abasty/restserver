@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
+import 'package:sse/client/sse_client.dart';
 
 const host = 'localhost:8067';
 
