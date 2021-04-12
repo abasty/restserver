@@ -34,18 +34,19 @@ Future<void> main() async {
 
   final sse = SseHandler(Uri.parse('/sync'));
 
-  var cascade = Cascade().add(sse.handler).add(api).handler;
+  var cascade = Cascade().add(api).add(sse.handler);
 
   // ignore: todo
   // TODO: Add CorsHeaders on Response in Pipeline
   // ignore: todo
   // TODO: Add sseClientId on Request in Pipeline
   var pipeline =
-      const Pipeline().addMiddleware(logRequests()).addHandler(cascade);
+      const Pipeline().addMiddleware(logRequests()).addHandler(cascade.handler);
 
   print('Launching API server');
   var server = await io.serve(pipeline, 'localhost', 8067);
   print('Server launched on ${server.address.address}:${server.port}');
+
   // ignore: todo
   // TODO: Move this loop in an async function
   while (await sse.connections.hasNext) {
