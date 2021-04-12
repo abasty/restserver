@@ -16,17 +16,14 @@ Future<Map<String, dynamic>> fetchMap(String uri) async {
   }
 }
 
-late http.Client _client;
+final _client = http.Client();
 
 Future<void> subscribe() async {
   print('Subscribing..');
   try {
-    _client = http.Client();
-
-    var request = http.Request('GET', Uri.parse('http://$host/sync'));
+    var request = http.Request('GET', Uri.http(host, 'sync'));
     request.headers['Cache-Control'] = 'no-cache';
     request.headers['Accept'] = 'text/event-stream';
-
     var response = await _client.send(request);
     print('Received statusCode: ${response.statusCode}');
   } catch (e) {
