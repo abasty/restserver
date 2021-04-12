@@ -37,6 +37,7 @@ class CoursesApi {
       return Response.ok('Deleted.');
     });
 
+    print('Registered Courses REST API');
     return router;
   }
 }
