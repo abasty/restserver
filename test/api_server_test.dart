@@ -26,7 +26,6 @@ Future<Stream<http.StreamedResponse>> subscribe() async {
   var request = http.Request('GET', Uri.http(host, 'sync'));
   request.headers['Cache-Control'] = 'no-cache';
   request.headers['Accept'] = 'text/event-stream';
-  // return _client.send(request).asStream();
   return _client.send(request).asStream();
 }
 
