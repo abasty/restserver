@@ -27,23 +27,11 @@ Future<void> subscribe() async {
     request.headers['Cache-Control'] = 'no-cache';
     request.headers['Accept'] = 'text/event-stream';
 
-    var response = _client.send(request);
-
-    response.asStream().listen((streamedResponse) {
-      print(
-          'Received streamedResponse.statusCode:${streamedResponse.statusCode}');
-      streamedResponse.stream.listen((data) {
-        print('Received data:$data');
-        _client.close();
-      });
-    });
+    var response = await _client.send(request);
+    print('Received statusCode: ${response.statusCode}');
   } catch (e) {
     print('Caught $e');
   }
-}
-
-void unsubscribe() {
-  _client.close();
 }
 
 void main() {
@@ -53,5 +41,6 @@ void main() {
   });
   test('Sync', () async {
     await subscribe();
+    _client.close();
   });
 }
