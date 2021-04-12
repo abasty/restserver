@@ -26,8 +26,15 @@ Future<Stream<http.StreamedResponse>> subscribe() async {
   var request = http.Request('GET', Uri.http(host, 'sync'));
   request.headers['Cache-Control'] = 'no-cache';
   request.headers['Accept'] = 'text/event-stream';
-  //var response = _client.send(request);
+  // return _client.send(request).asStream();
   return _client.send(request).asStream();
+}
+
+void handleSse(Stream<http.StreamedResponse> sse) async {
+  await for (var response in sse) {
+    // Here call a callback
+    print('Received statusCode: ${response.statusCode}');
+  }
 }
 
 void main() {
@@ -43,8 +50,8 @@ void main() {
   test('Sync', () async {
     var stream = await subscribe();
     try {
-      var response = await stream.single;
-      print('Received statusCode: ${response.statusCode}');
+      handleSse(stream);
+      await Future.delayed(Duration(milliseconds: 100));
     } on Exception {
       print('Connexion impossible');
       assert(false);
