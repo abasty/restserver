@@ -50,7 +50,7 @@ void main() {
     var stream = await subscribe();
     try {
       handleSse(stream);
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(Duration(milliseconds: 2000));
     } on Exception {
       print('Connexion impossible');
       assert(false);

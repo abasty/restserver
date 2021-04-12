@@ -14,7 +14,6 @@ Future<void> main() async {
   api.mount('/courses/', CoursesApi().router);
   final sse = SseHandler(Uri.parse('/sync'));
   var cascade = Cascade().add(sse.handler).add(api).handler;
-  // ignore: todo
   // TODO: Add CorsHeaders in Pipeline
   var pipeline =
       const Pipeline().addMiddleware(logRequests()).addHandler(cascade);
@@ -22,11 +21,18 @@ Future<void> main() async {
   print('Launching API server');
   var server = await io.serve(pipeline, 'localhost', 8067);
   print('Server launched on ${server.address.address}:${server.port}');
+  // TODO: Move this loop in an async function
   var connections = sse.connections;
   while (await connections.hasNext) {
     var connection = await connections.next;
     print('Connection (sse): $connection.');
+    connection.stream.listen(print, onDone: () {
+      print('done');
+    }, onError: (Object e) {
+      print('error');
+    });
   }
+  print('main end');
 }
 
 // void addCorsHeaders(HttpResponse response) {
