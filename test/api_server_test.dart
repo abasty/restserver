@@ -16,7 +16,7 @@ Future<Map<String, dynamic>> fetchMap(String uri) async {
   }
 }
 
-var _client;
+late http.Client _client;
 
 Future<void> subscribe() async {
   print('Subscribing..');
@@ -27,13 +27,14 @@ Future<void> subscribe() async {
     request.headers['Cache-Control'] = 'no-cache';
     request.headers['Accept'] = 'text/event-stream';
 
-    Future<http.StreamedResponse> response = _client.send(request);
+    var response = _client.send(request);
 
     response.asStream().listen((streamedResponse) {
       print(
           'Received streamedResponse.statusCode:${streamedResponse.statusCode}');
       streamedResponse.stream.listen((data) {
         print('Received data:$data');
+        _client.close();
       });
     });
   } catch (e) {
