@@ -18,9 +18,12 @@ Future<Map<String, dynamic>> fetchMap(String uri) async {
 
 final _client = http.Client();
 
+// This one should return the stream
 Future<void> subscribe() async {
   print('Subscribing..');
   try {
+    // Cannot use _client.get because of `fromStream` in _sendUnstreamed (hangs)
+    // return Response.fromStream(await send(request));
     var request = http.Request('GET', Uri.http(host, 'sync'));
     request.headers['Cache-Control'] = 'no-cache';
     request.headers['Accept'] = 'text/event-stream';
