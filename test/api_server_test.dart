@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -18,33 +19,36 @@ Future<Map<String, dynamic>> fetchMap(String uri) async {
 
 final _client = http.Client();
 
-// This one should return the stream
-Future<void> subscribe() async {
+Future<Stream<http.StreamedResponse>> subscribe() async {
   print('Subscribing..');
-  try {
-    // Cannot use _client.get because of `fromStream` in _sendUnstreamed (hangs)
-    // return Response.fromStream(await send(request));
-    var request = http.Request('GET', Uri.http(host, 'sync'));
-    request.headers['Cache-Control'] = 'no-cache';
-    request.headers['Accept'] = 'text/event-stream';
-    //var response = _client.send(request);
-    var response = await _client.send(request).asStream().first;
-    //var status = response.stream.first
-
-    //var response = await http.Response.fromStream(await _client.send(request));
-    print('Received statusCode: ${response.statusCode}');
-  } catch (e) {
-    print('Caught $e');
-  }
+  // Cannot use _client.get because of `fromStream` in _sendUnstreamed (hangs)
+  // return Response.fromStream(await send(request));
+  var request = http.Request('GET', Uri.http(host, 'sync'));
+  request.headers['Cache-Control'] = 'no-cache';
+  request.headers['Accept'] = 'text/event-stream';
+  //var response = _client.send(request);
+  return _client.send(request).asStream();
 }
 
 void main() {
   test('GET rayons', () async {
-    var map = await fetchMap('courses/all');
-    print(map);
+    try {
+      var map = await fetchMap('courses/all');
+      print(map);
+    } on Exception {
+      print('Connexion impossible');
+      assert(false);
+    }
   });
   test('Sync', () async {
-    await subscribe();
+    var stream = await subscribe();
+    try {
+      var response = await stream.single;
+      print('Received statusCode: ${response.statusCode}');
+    } on Exception {
+      print('Connexion impossible');
+      assert(false);
+    }
     _client.close();
   });
 }
