@@ -24,7 +24,11 @@ Future<void> subscribe() async {
     var request = http.Request('GET', Uri.http(host, 'sync'));
     request.headers['Cache-Control'] = 'no-cache';
     request.headers['Accept'] = 'text/event-stream';
-    var response = await _client.send(request);
+    //var response = _client.send(request);
+    var response = await _client.send(request).asStream().first;
+    //var status = response.stream.first
+
+    //var response = await http.Response.fromStream(await _client.send(request));
     print('Received statusCode: ${response.statusCode}');
   } catch (e) {
     print('Caught $e');
