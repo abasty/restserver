@@ -13,7 +13,7 @@ Future<void> main() async {
   db = MapDb('assets/courses.json');
   final api = Router();
   api.mount('/courses/', CoursesApi().router);
-  final sse = SseHandler(Uri.http('127.0.0.1:8067', 'sync'));
+  final sse = SseHandler(Uri.parse('/sync'));
   var handler = Cascade().add(sse.handler).add(api).handler;
 
   // ignore: todo
