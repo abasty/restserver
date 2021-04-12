@@ -13,12 +13,11 @@ Future<void> main() async {
   db = MapDb('assets/courses.json');
   final api = Router();
   api.mount('/courses/', CoursesApi().router);
-  final sse = SseHandler(Uri.http('127.0.0.1:8067', 'sync')).handler;
-
-  var handler = Cascade().add(sse).add(api).handler;
+  final sse = SseHandler(Uri.http('127.0.0.1:8067', 'sync'));
+  var handler = Cascade().add(sse.handler).add(api).handler;
 
   // ignore: todo
-  // TODO: Add CorsHeaders with a middleware
+  // TODO: Add CorsHeaders in Pipeline
   var server =
       const Pipeline().addMiddleware(logRequests()).addHandler(handler);
 
