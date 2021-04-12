@@ -8,29 +8,50 @@ import 'package:sse/server/sse_handler.dart';
 import 'package:restserver/courses_api.dart';
 import 'package:restserver/mapdb.dart';
 
+final List<SseConnection> clients = [];
+
+void registerSse(SseConnection client) {
+  // On place les clients dans un tableau, sur error ou done on les vire. Sur
+  // data on propage la data sur les autres.
+  clients.add(client);
+  print('Connection (sse): ${client.hashCode}.');
+  client.stream.listen(print, onDone: () {
+    var ok = clients.remove(client);
+    print('Removed ${client.hashCode} OK: $ok');
+    print('Clients: ${clients.length}');
+  }, onError: (Object e) {
+    var ok = clients.remove(client);
+    print('Removed ${client.hashCode} OK: $ok');
+    clients.remove(client);
+  }, cancelOnError: true);
+}
+
 Future<void> main() async {
   db = MapDb('assets/courses.json');
+
   final api = Router();
   api.mount('/courses/', CoursesApi().router);
+
   final sse = SseHandler(Uri.parse('/sync'));
+
   var cascade = Cascade().add(sse.handler).add(api).handler;
-  // TODO: Add CorsHeaders in Pipeline
+
+  // ignore: todo
+  // TODO: Add CorsHeaders on Response in Pipeline
+  // ignore: todo
+  // TODO: Add sseClientId on Request in Pipeline
   var pipeline =
       const Pipeline().addMiddleware(logRequests()).addHandler(cascade);
 
   print('Launching API server');
   var server = await io.serve(pipeline, 'localhost', 8067);
   print('Server launched on ${server.address.address}:${server.port}');
+  // ignore: todo
   // TODO: Move this loop in an async function
-  var connections = sse.connections;
-  while (await connections.hasNext) {
-    var connection = await connections.next;
-    print('Connection (sse): $connection.');
-    connection.stream.listen(print, onDone: () {
-      print('done');
-    }, onError: (Object e) {
-      print('error');
-    });
+  while (await sse.connections.hasNext) {
+    var client = await sse.connections.next;
+    registerSse(client);
+    print('Clients: ${sse.numberOfClients}');
   }
   print('main end');
 }

@@ -3,8 +3,6 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
-// ignore: import_of_legacy_library_into_null_safe
-// import 'package:sse/client/sse_client.dart';
 
 const host = 'localhost:8067';
 
@@ -17,16 +15,18 @@ Future<Map<String, dynamic>> fetchMap(String uri) async {
   }
 }
 
-final _client = http.Client();
+int sseClientId = 0;
 
-Future<Stream<http.StreamedResponse>> subscribe() async {
+Future<Stream<http.StreamedResponse>> subscribe(http.Client client) async {
   print('Subscribing..');
   // Cannot use _client.get because of `fromStream` in _sendUnstreamed (hangs)
   // return Response.fromStream(await send(request));
-  var request = http.Request('GET', Uri.http(host, 'sync'));
+  sseClientId++;
+  var request = http.Request(
+      'GET', Uri.http(host, '/sync', {'sseClientId': '$sseClientId'}));
   request.headers['Cache-Control'] = 'no-cache';
   request.headers['Accept'] = 'text/event-stream';
-  return _client.send(request).asStream();
+  return client.send(request).asStream();
 }
 
 void handleSse(Stream<http.StreamedResponse> sse) async {
@@ -46,15 +46,16 @@ void main() {
       assert(false);
     }
   });
+
   test('Sync', () async {
-    var stream = await subscribe();
+    final client = http.Client();
     try {
-      handleSse(stream);
-      await Future.delayed(Duration(milliseconds: 2000));
+      handleSse(await subscribe(client));
+      handleSse(await subscribe(client));
+      await Future.delayed(Duration(milliseconds: 100));
     } on Exception {
       print('Connexion impossible');
       assert(false);
     }
-    _client.close();
   });
 }
