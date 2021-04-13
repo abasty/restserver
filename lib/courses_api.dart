@@ -10,6 +10,7 @@ class CoursesApi {
     final router = Router();
 
     router.get('/all', (Request request) {
+      // print(request.headers['mon-header']);
       return Response.ok(json.encode(db.data),
           headers: {'Content-Type': 'application/json'});
     });

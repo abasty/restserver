@@ -51,12 +51,42 @@ Future<void> main() async {
   // ignore: todo
   // TODO: Add CorsHeaders on Response in Pipeline
   // ignore: todo
-  // TODO: Add sseClientId on Request in Pipeline
-  var pipeline =
-      const Pipeline().addMiddleware(logRequests()).addHandler(cascade.handler);
+  // TODO: Check if clientId is present in sync request and unique (or else
+  // discard the sync request)
+  var pipeline = const Pipeline()
+      .addMiddleware(logRequests())
+      // .addMiddleware(addClientId)
+      .addHandler(cascade.handler);
 
   var server = await io.serve(pipeline, 'localhost', 8067);
   print('Server launched on ${server.address.address}:${server.port}');
+}
+
+int sseClientId = 0;
+
+// FIXME: Was not able to add parameter sseClientId to the request as query is
+// read-only when created with request.change => ask question to shelf
+Handler addClientId(innerHandler) {
+  return (request) async {
+    // var updatedRequest = request.change(
+    //   headers: {'mon-header': 'ma-valeur'},
+    //   // path: '/',
+    // );
+    var updatedRequest = request;
+    if (request.url.path == 'sync') {
+      updatedRequest = Request(
+        'GET',
+        Uri.http('localhost', '/sync', {'sseClientId': '${sseClientId++}'}),
+        headers: request.headers,
+        context: request.context,
+        // onHijack: request.
+      );
+
+      print('request: ${request.requestedUri}');
+      print('request: ${updatedRequest.requestedUri}');
+    }
+    return await innerHandler(updatedRequest);
+  };
 }
 
 // void addCorsHeaders(HttpResponse response) {
