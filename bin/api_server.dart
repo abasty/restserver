@@ -1,5 +1,6 @@
 // @dart=2.9
 
+import 'dart:async';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
@@ -46,13 +47,10 @@ Future<void> main() async {
   final sse = SseHandler(Uri.parse('/sync'));
   registerSseServer(sse);
 
-  var cascade = Cascade().add(api).add(sse.handler);
+  var cascade = Cascade().add(api).add(checkSseClientId).add(sse.handler);
 
   // ignore: todo
   // TODO: Add CorsHeaders on Response in Pipeline
-  // ignore: todo
-  // TODO: Check if clientId is present in sync request and unique (or else
-  // discard the sync request)
   var pipeline = const Pipeline()
       .addMiddleware(logRequests())
       // .addMiddleware(addClientId)
@@ -62,9 +60,22 @@ Future<void> main() async {
   print('Server launched on ${server.address.address}:${server.port}');
 }
 
+FutureOr<Response> checkSseClientId(request) {
+  // Check if sseClientId is valid in sync request (or else send back a
+  // forbidden error response)
+  if (request.url.path == 'sync') {
+    var sseClientIdStr = request.url.queryParameters['sseClientId'];
+    var sseClientId = int.tryParse(sseClientIdStr ?? '-1');
+    if (sseClientId <= 0) {
+      return Response.forbidden('Invalid sseClientId value');
+    }
+  }
+  return Response.notFound('not found');
+}
+
 int sseClientId = 0;
 
-// FIXME: Was not able to add parameter sseClientId to the request as query is
+// Was not able to add parameter sseClientId to the request as query is
 // read-only when created with request.change => ask question to shelf
 Handler addClientId(innerHandler) {
   return (request) async {

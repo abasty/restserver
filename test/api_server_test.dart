@@ -15,15 +15,13 @@ Future<Map<String, dynamic>> fetchMap(String uri) async {
   }
 }
 
-int sseClientId = 0;
-
-Future<Stream<http.StreamedResponse>> subscribe(http.Client client) async {
-  print('Subscribing..');
+Future<Stream<http.StreamedResponse>> subscribeSse(
+    http.Client client, int id) async {
+  print('Subscribing to SSE with sseClientId: $id.');
   // Cannot use _client.get because of `fromStream` in _sendUnstreamed (hangs)
   // return Response.fromStream(await send(request));
-  sseClientId++;
-  var request = http.Request(
-      'GET', Uri.http(host, '/sync', {'sseClientId': '$sseClientId'}));
+  var request =
+      http.Request('GET', Uri.http(host, '/sync', {'sseClientId': '$id'}));
   request.headers['Cache-Control'] = 'no-cache';
   request.headers['Accept'] = 'text/event-stream';
   return client.send(request).asStream();
@@ -31,13 +29,14 @@ Future<Stream<http.StreamedResponse>> subscribe(http.Client client) async {
 
 void handleSse(Stream<http.StreamedResponse> sse) async {
   await for (var response in sse) {
-    // Here call a callback
     print('Received statusCode: ${response.statusCode}');
+    if (response.statusCode != 200) return;
+    // Here handle server sent event
   }
 }
 
 void main() {
-  test('GET rayons', () async {
+  test('GET /courses/rayons', () async {
     try {
       var map = await fetchMap('courses/all');
       print(map);
@@ -50,9 +49,9 @@ void main() {
   test('Sync', () async {
     final client = http.Client();
     try {
-      handleSse(await subscribe(client));
-      handleSse(await subscribe(client));
-      await Future.delayed(Duration(milliseconds: 100));
+      handleSse(await subscribeSse(client, 0));
+      handleSse(await subscribeSse(client, 1));
+      await Future.delayed(Duration(milliseconds: 500));
     } on Exception {
       print('Connexion impossible');
       assert(false);
