@@ -14,7 +14,6 @@ final List<SseConnection> clients = [];
 void closeSseClient(SseConnection client) {
   var ok = clients.remove(client);
   print('Unregister Sync Client [${client.hashCode}, OK: $ok]');
-  clients.remove(client);
 }
 
 void acceptSseClient(SseConnection client) {
