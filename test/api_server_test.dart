@@ -51,6 +51,8 @@ void main() {
     try {
       handleSse(await subscribeSse(client, 0));
       handleSse(await subscribeSse(client, 1));
+      handleSse(await subscribeSse(client, 1));
+      handleSse(await subscribeSse(client, 2));
       await Future.delayed(Duration(milliseconds: 500));
     } on Exception {
       print('Connexion impossible');
