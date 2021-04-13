@@ -11,30 +11,29 @@ import 'package:restserver/mapdb.dart';
 
 final List<SseConnection> clients = [];
 
-void unregisterSseClient(SseConnection client) {
+void closeSseClient(SseConnection client) {
   var ok = clients.remove(client);
   print('Unregister Sync Client [${client.hashCode}, OK: $ok]');
   clients.remove(client);
 }
 
-void registerSseClient(SseConnection client) {
+void acceptSseClient(SseConnection client) {
   // On place les clients dans un tableau, sur error ou done on les vire. Sur
   // data on propage la data sur les autres.
   print('Registered new Sync Client [${client.hashCode}]');
   clients.add(client);
   client.stream.listen(print, onDone: () {
-    unregisterSseClient(client);
+    closeSseClient(client);
   }, onError: (Object e) {
-    unregisterSseClient(client);
+    closeSseClient(client);
   }, cancelOnError: true);
 }
 
-void registerSseServer(SseHandler sse) async {
-  print('Registered Sync Server');
+void listenSseClients(SseHandler sse) async {
+  print('Listen SSE clients');
   while (await sse.connections.hasNext) {
     var client = await sse.connections.next;
-    registerSseClient(client);
-    // print('Clients: ${sse.numberOfClients}');
+    acceptSseClient(client);
   }
 }
 
@@ -45,7 +44,7 @@ Future<void> main() async {
   api.mount('/courses/', CoursesApi().router);
 
   final sse = SseHandler(Uri.parse('/sync'));
-  registerSseServer(sse);
+  listenSseClients(sse);
 
   var cascade = Cascade().add(api).add(checkSseClientId).add(sse.handler);
 
