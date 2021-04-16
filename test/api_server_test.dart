@@ -74,12 +74,11 @@ void main() {
       final result_invalid = await handleSse(await subscribeSse(client, 0));
       final result_valid = await handleSse(await subscribeSse(client, 1));
       final result_dupplicate = await handleSse(await subscribeSse(client, 1));
-      final result_new_valid_ok =
-          await handleSse(await subscribeSse(client, 2));
+      final result_new_valid = await handleSse(await subscribeSse(client, 2));
       assert(result_invalid == false);
       assert(result_valid == true);
       assert(result_dupplicate == false);
-      assert(result_new_valid_ok == true);
+      assert(result_new_valid == true);
     } on Exception {
       print('Connexion impossible');
       assert(false);
