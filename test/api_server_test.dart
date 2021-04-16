@@ -17,7 +17,7 @@ Future<Object> fetchData(String uri) async {
 
 Future<Stream<http.StreamedResponse>> subscribeSse(
     http.Client client, int id) async {
-  print('Subscribing to SSE with sseClientId: $id.');
+  // print('Subscribing to SSE with sseClientId: $id.');
   // Cannot use _client.get because of `fromStream` in _sendUnstreamed (hangs)
   // return Response.fromStream(await send(request));
   var request =
@@ -27,12 +27,13 @@ Future<Stream<http.StreamedResponse>> subscribeSse(
   return client.send(request).asStream();
 }
 
-void handleSse(Stream<http.StreamedResponse> sse) async {
+Future<bool> handleSse(Stream<http.StreamedResponse> sse) async {
   await for (var response in sse) {
-    print('Received statusCode: ${response.statusCode}');
-    if (response.statusCode != 200) return;
+    // print('Received statusCode: ${response.statusCode}');
+    if (response.statusCode != 200) return false;
     // Here handle server sent event
   }
+  return true;
 }
 
 void main() {
@@ -67,14 +68,18 @@ void main() {
     }
   });
 
-  test('Sync', () async {
+  test('GET /sync?clientId=<N>', () async {
     final client = http.Client();
     try {
-      handleSse(await subscribeSse(client, 0));
-      handleSse(await subscribeSse(client, 1));
-      handleSse(await subscribeSse(client, 1));
-      handleSse(await subscribeSse(client, 2));
-      await Future.delayed(Duration(milliseconds: 500));
+      final result_invalid = await handleSse(await subscribeSse(client, 0));
+      final result_valid = await handleSse(await subscribeSse(client, 1));
+      final result_dupplicate = await handleSse(await subscribeSse(client, 1));
+      final result_new_valid_ok =
+          await handleSse(await subscribeSse(client, 2));
+      assert(result_invalid == false);
+      assert(result_valid == true);
+      assert(result_dupplicate == false);
+      assert(result_new_valid_ok == true);
     } on Exception {
       print('Connexion impossible');
       assert(false);
