@@ -67,16 +67,16 @@ Future<void> main() async {
   final sse = SseHandler(Uri.parse('/sync'));
   listenSseClients(sse);
 
-  var cascade = Cascade().add(api).add(checkSseClientId).add(sse.handler);
+  final cascade = Cascade().add(api).add(checkSseClientId).add(sse.handler);
 
   // ignore: todo
   // TODO: Add CorsHeaders on Response in Pipeline
-  var pipeline = const Pipeline()
+  final pipeline = const Pipeline()
       .addMiddleware(logRequests())
       // .addMiddleware(addMonHeader)
       .addHandler(cascade.handler);
 
-  var server = await io.serve(pipeline, 'localhost', 8067);
+  final server = await io.serve(pipeline, 'localhost', 8067);
   print('Server launched on ${server.address.address}:${server.port}');
 }
 
