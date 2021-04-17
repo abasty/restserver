@@ -55,10 +55,10 @@ class CoursesSee {
     }
   }
 
-  void advertiseOthers(int clientId) {
+  void advertiseOthers(String payload) {
     clients.forEach((id, client) {
-      print('$id');
-      client.sink.add('payload');
+      // print('$id');
+      client.sink.add(payload);
     });
   }
 }

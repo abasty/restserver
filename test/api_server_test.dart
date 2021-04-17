@@ -17,28 +17,6 @@ Future<Object> fetchData(String uri) async {
   }
 }
 
-/*
-Future<Stream<http.StreamedResponse>> subscribeSse(
-    http.Client client, int id) async {
-  // print('Subscribing to SSE with sseClientId: $id.');
-  // Cannot use _client.get because of `fromStream` in _sendUnstreamed (hangs)
-  // return Response.fromStream(await send(request));
-  var request =
-      http.Request('GET', Uri.http(host, '/sync', {'sseClientId': '$id'}));
-  request.headers['Cache-Control'] = 'no-cache';
-  request.headers['Accept'] = 'text/event-stream';
-  return client.send(request).asStream();
-}
-
-Future<bool> handleSse(Stream<http.StreamedResponse> sse) async {
-  await for (var response in sse) {
-    print('Received statusCode: ${response.statusCode}');
-    if (response.statusCode != 200) return false;
-    // Here handle server sent event
-  }
-  return true;
-}*/
-
 void main() {
   test('API GET /courses/all', () async {
     try {
@@ -74,8 +52,13 @@ void main() {
   test('SseClient', () async {
     var produit = {};
     var client;
+    var data = <String>[];
     try {
-      client = SseClient('http://localhost:8067/sync')..stream.listen(null);
+      client = SseClient(
+        'http://localhost:8067/sync',
+      )..stream.listen((event) {
+          data.add(event);
+        }, cancelOnError: true);
       await client.onConnected;
       // Demande la liste des produits et sélectionne le premier
       var produits = await fetchData('courses/produits');
@@ -94,10 +77,16 @@ void main() {
       body: json.encode(produit),
     );
     assert(response.statusCode == 200);
-    // Vérifie que le produit retourné a le même nom
-    var produit_ret = json.decode(response.body);
-    assert(produit_ret is Map<String, dynamic>);
-    produit_ret = produit_ret as Map<String, dynamic>;
-    assert(produit['nom'] == produit_ret['nom']);
+    data.forEach((str) {
+      if (str.startsWith('data: ')) {
+        // Vérifie que le produit retourné a le même nom
+        var produit_ret = json
+            .decode(str.substring(7, str.length - 1).replaceAll('\\"', '"'));
+        // print(produit_ret);
+        assert(produit_ret is Map<String, dynamic>);
+        produit_ret = produit_ret as Map<String, dynamic>;
+        assert(produit['nom'] == produit_ret['nom']);
+      }
+    });
   });
 }

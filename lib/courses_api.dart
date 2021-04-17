@@ -31,8 +31,7 @@ class CoursesApi {
     router.post('/produit', (Request request) async {
       final payload = await request.readAsString();
       print('payload: $payload');
-      // data.add(json.decode(payload));
-      courses_sse.advertiseOthers(0);
+      courses_sse.advertiseOthers(payload);
       return Response.ok(payload,
           headers: {'Content-Type': 'application/json'});
     });
