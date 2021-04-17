@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:restserver/courses_sse_client.dart';
 import 'package:test/test.dart';
+
+import 'package:restserver/courses_sse_client.dart';
 
 const host = 'localhost:8067';
 
@@ -16,6 +17,7 @@ Future<Object> fetchData(String uri) async {
   }
 }
 
+/*
 Future<Stream<http.StreamedResponse>> subscribeSse(
     http.Client client, int id) async {
   // print('Subscribing to SSE with sseClientId: $id.');
@@ -35,7 +37,7 @@ Future<bool> handleSse(Stream<http.StreamedResponse> sse) async {
     // Here handle server sent event
   }
   return true;
-}
+}*/
 
 void main() {
   test('API GET /courses/all', () async {
@@ -69,78 +71,33 @@ void main() {
     }
   });
 
-//   test(
-//     'SSE subscription',
-//     () async {
-//       final client = http.Client();
-//       try {
-//         final result_invalid = await handleSse(await subscribeSse(client, 0));
-//         final result_valid = await handleSse(await subscribeSse(client, 1));
-//         final result_dupplicate =
-//             await handleSse(await subscribeSse(client, 1));
-//         final result_new_valid = await handleSse(await subscribeSse(client, 2));
-//         assert(result_invalid == false);
-//         assert(result_valid == true);
-//         assert(result_dupplicate == false);
-//         assert(result_new_valid == true);
-//       } on Exception {
-//         print('Connexion impossible');
-//         assert(false);
-//       }
-//       client.close();
-//     },
-//   );
-
   test('SseClient', () async {
-    // late var client;
+    var produit = {};
+    var client;
     try {
-      // client =
-      SseClient('http://localhost:8067/sync').stream.listen((event) {
-        print(event);
-      });
-      await http.post(
-        Uri.http(host, 'courses/produit'),
-        body: json.encode({
-          'nom': 'Truc',
-          'rayon': {'nom': 'Divers'}
-        }),
-      );
+      client = SseClient('http://localhost:8067/sync')..stream.listen(null);
+      await client.onConnected;
+      // Demande la liste des produits et sélectionne le premier
+      var produits = await fetchData('courses/produits');
+      assert(produits is List);
+      produits = produits as List;
+      assert(produits.isNotEmpty);
+      assert(produits[0] is Map<String, dynamic>);
+      produit = produits[0] as Map<String, dynamic>;
     } on Exception {
       print('Connexion impossible');
       assert(false);
     }
+    // Poste le produit sélectionné
+    var response = await http.post(
+      Uri.http(host, 'courses/produit'),
+      body: json.encode(produit),
+    );
+    assert(response.statusCode == 200);
+    // Vérifie que le produit retourné a le même nom
+    var produit_ret = json.decode(response.body);
+    assert(produit_ret is Map<String, dynamic>);
+    produit_ret = produit_ret as Map<String, dynamic>;
+    assert(produit['nom'] == produit_ret['nom']);
   });
-
-//  test('SSE after API POST', () async {
-//    final client = http.Client();
-//    var produit = {};
-//    try {
-//      // Établit une connexion SSE
-//      final sse_ok = await handleSse(await subscribeSse(client, 1));
-//      assert(sse_ok == true);
-//      // Demande la liste des produits et sélectionne le premier
-//      var produits = await fetchData('courses/produits');
-//      assert(produits is List);
-//      produits = produits as List;
-//      assert(produits.isNotEmpty);
-//      assert(produits[0] is Map<String, dynamic>);
-//      produit = produits[0] as Map<String, dynamic>;
-//    } on Exception {
-//      print('Connexion impossible');
-//      assert(false);
-//    }
-//    // Poste le produit sélectionné
-//    var response = await http.post(
-//      Uri.http(host, 'courses/produit'),
-//      body: json.encode(produit),
-//    );
-//    assert(response.statusCode == 200);
-//    // Vérifie que le produit retourné a le même nom
-//    var produit_ret = json.decode(response.body);
-//    assert(produit_ret is Map<String, dynamic>);
-//    produit_ret = produit_ret as Map<String, dynamic>;
-//    print(produit_ret);
-//    assert(produit['nom'] == produit_ret['nom']);
-//    await Future.delayed(Duration(seconds: 2));
-//  });
 }

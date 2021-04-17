@@ -11,12 +11,26 @@ String randomSseClientId() {
 }
 
 class SseClient extends StreamChannelMixin<String> {
+  Future<void> get onConnected => _onConnected.future;
+
+  /// Add messages to this [StreamSink] to send them to the server.
+  ///
+  /// The message added to the sink has to be JSON encodable. Messages that fail
+  /// to encode will be logged through a [Logger].
+  @override
+  StreamSink<String> get sink => _outgoingController.sink;
+
+  /// [Stream] of messages sent from the server to this client.
+  ///
+  /// A message is a decoded JSON object.
+  @override
+  Stream<String> get stream => _incomingController.stream;
+
   late final StreamController<String> _incomingController;
   final _outgoingController = StreamController<String>();
   // final _logger = Logger('SseClient');
   final _onConnected = Completer();
   // int _lastMessageId = -1;
-  // late final EventSource _eventSource;
   late String _serverUrl;
   final _client = http.Client();
 
@@ -33,16 +47,20 @@ class SseClient extends StreamChannelMixin<String> {
         _client.send(request).then(
           (response) {
             if (response.statusCode == 200) {
+              _onConnected.complete();
               response.stream
                   .transform(utf8.decoder)
                   .transform(LineSplitter())
                   .listen((line) {
-                print(line);
                 _incomingController.sink.add(line);
               });
             } else {
               _incomingController
                   .addError(Exception('Failed to connect to $_serverUrl'));
+              close();
+              if (!_onConnected.isCompleted) {
+                _onConnected.completeError(response.statusCode);
+              }
             }
           },
         );
@@ -52,21 +70,6 @@ class SseClient extends StreamChannelMixin<String> {
       },
     );
   }
-
-  Future<void> get onConnected => _onConnected.future;
-
-  /// Add messages to this [StreamSink] to send them to the server.
-  ///
-  /// The message added to the sink has to be JSON encodable. Messages that fail
-  /// to encode will be logged through a [Logger].
-  @override
-  StreamSink<String> get sink => _outgoingController.sink;
-
-  /// [Stream] of messages sent from the server to this client.
-  ///
-  /// A message is a decoded JSON object.
-  @override
-  Stream<String> get stream => _incomingController.stream;
 
   void close() {
     // If the initial connection was never established. Add a listener so close

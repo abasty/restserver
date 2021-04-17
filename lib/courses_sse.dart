@@ -29,7 +29,7 @@ class CoursesSee {
   /// close SSE client and remove it from clients list
   void closeSseClient(SseConnection client) {
     clients.removeWhere((key, value) => client == value);
-    print('Unregister Sync Client [${client.hashCode}]');
+    print('Close SSE Client [${client.hashCode}]');
   }
 
   void acceptSseClient(SseConnection client) {
@@ -57,12 +57,8 @@ class CoursesSee {
 
   void advertiseOthers(int clientId) {
     clients.forEach((id, client) {
-      // if clientId != id
-
-      client.sink.add('Content-Type: text/event-stream\n\n');
-      client.sink.add('event: toto\n');
-      client.sink.add('data: data\n');
-      client.sink.add('\n');
+      print('$id');
+      client.sink.add('payload');
     });
   }
 }
