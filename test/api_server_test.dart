@@ -29,7 +29,7 @@ Future<Stream<http.StreamedResponse>> subscribeSse(
 
 Future<bool> handleSse(Stream<http.StreamedResponse> sse) async {
   await for (var response in sse) {
-    // print('Received statusCode: ${response.statusCode}');
+    print('Received statusCode: ${response.statusCode}');
     if (response.statusCode != 200) return false;
     // Here handle server sent event
   }

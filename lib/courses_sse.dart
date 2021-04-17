@@ -58,7 +58,10 @@ class CoursesSee {
   void advertiseOthers(int clientId) {
     clients.forEach((id, client) {
       // if clientId != id
-      client.sink.add('data: toto\n');
+
+      client.sink.add('Content-Type: text/event-stream\n\n');
+      client.sink.add('event: toto\n');
+      client.sink.add('data: data\n');
       client.sink.add('\n');
     });
   }
