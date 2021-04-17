@@ -37,7 +37,7 @@ Future<bool> handleSse(Stream<http.StreamedResponse> sse) async {
 }
 
 void main() {
-  test('GET /courses/all', () async {
+  test('API GET /courses/all', () async {
     try {
       var map = await fetchData('courses/all');
       assert(map is Map<String, dynamic>);
@@ -52,7 +52,7 @@ void main() {
     }
   });
 
-  test('GET /courses/rayons', () async {
+  test('API GET /courses/rayons', () async {
     try {
       var rayons = await fetchData('courses/rayons');
       assert(rayons is List);
@@ -68,7 +68,7 @@ void main() {
     }
   });
 
-  test('GET /sync?clientId=<N>', () async {
+  test('SSE subscription', () async {
     final client = http.Client();
     try {
       final result_invalid = await handleSse(await subscribeSse(client, 0));
@@ -83,5 +83,39 @@ void main() {
       print('Connexion impossible');
       assert(false);
     }
+    client.close();
+  });
+
+  test('SSE after API POST', () async {
+    final client = http.Client();
+    var produit = {};
+    try {
+      // Établit une connexion SSE
+      final sse_ok = await handleSse(await subscribeSse(client, 1));
+      assert(sse_ok == true);
+      // Demande la liste des produits et sélectionne le premier
+      var produits = await fetchData('courses/produits');
+      assert(produits is List);
+      produits = produits as List;
+      assert(produits.isNotEmpty);
+      assert(produits[0] is Map<String, dynamic>);
+      produit = produits[0] as Map<String, dynamic>;
+    } on Exception {
+      print('Connexion impossible');
+      assert(false);
+    }
+    // Poste le produit sélectionné
+    var response = await http.post(
+      Uri.http(host, 'courses/produit'),
+      body: json.encode(produit),
+    );
+    assert(response.statusCode == 200);
+    // Vérifie que le produit retourné a le même nom
+    var produit_ret = json.decode(response.body);
+    assert(produit_ret is Map<String, dynamic>);
+    produit_ret = produit_ret as Map<String, dynamic>;
+    print(produit_ret);
+    assert(produit['nom'] == produit_ret['nom']);
+    await Future.delayed(Duration(seconds: 2));
   });
 }

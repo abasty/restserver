@@ -1,5 +1,8 @@
+// @dart=2.9
+
 import 'dart:convert';
 
+import 'package:restserver/courses_sse.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
@@ -25,9 +28,11 @@ class CoursesApi {
           headers: {'Content-Type': 'application/json'});
     });
 
-    router.post('/', (Request request) async {
+    router.post('/produit', (Request request) async {
       final payload = await request.readAsString();
+      print('payload: $payload');
       // data.add(json.decode(payload));
+      courses_sse.advertiseOthers(0);
       return Response.ok(payload,
           headers: {'Content-Type': 'application/json'});
     });
