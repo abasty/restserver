@@ -17,7 +17,7 @@ Future<void> main() async {
   api.mount('/courses/', CoursesApi().router);
 
   final sse = SseHandler(Uri.parse('/sync'));
-  courses_sse.listenSseClients(sse);
+  courses_sse.listen(sse);
 
   final cascade =
       Cascade().add(api).add(courses_sse.checkSseClientId).add(sse.handler);

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
@@ -55,6 +56,7 @@ void main() {
     var client;
     var client2;
     var data = <String>[];
+    var quantite = 0;
     try {
       /// Création de deux clients SSE
       client = SseClient(sse_url)
@@ -73,7 +75,8 @@ void main() {
 
       /// [produit] contient le premier produit, on fixe sa quantité
       produit = produits[0] as Map<String, dynamic>;
-      produit['quantite'] = 42;
+      quantite = Random().nextInt(100);
+      produit['quantite'] = quantite;
     } on Exception {
       print('Connexion impossible');
       assert(false);
@@ -90,15 +93,15 @@ void main() {
     var count = 0;
     data.forEach((str) {
       if (str.startsWith('data: ')) {
-        /// Vérifie que le produit retourné a le même nom
         var produit_ret = json
             .decode(str.substring(7, str.length - 1).replaceAll('\\"', '"'));
-
-        /// print(produit_ret);
         assert(produit_ret is Map<String, dynamic>);
         produit_ret = produit_ret as Map<String, dynamic>;
-        assert(produit['nom'] == produit_ret['nom']);
-        assert(produit_ret['quantite'] == 42);
+
+        /// Vérifie que le produit retourné a le même nom et que sa quantité a
+        /// été modifiée
+        assert(produit_ret['nom'] == produit['nom']);
+        assert(produit_ret['quantite'] == quantite);
         count++;
       }
     });

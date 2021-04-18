@@ -5,7 +5,7 @@ import 'dart:async';
 import 'package:shelf/shelf.dart';
 import 'package:sse/server/sse_handler.dart';
 
-class CoursesSee {
+class CoursesSse {
   final Map<int, SseConnection> clients = {};
   final Set<int> incomings = {};
 
@@ -27,7 +27,7 @@ class CoursesSee {
   }
 
   /// close SSE client and remove it from clients list
-  void closeSseClient(SseConnection client) {
+  void close(SseConnection client) {
     clients.removeWhere((key, value) {
       if (value == client) {
         print('Close SSE Client [$key]');
@@ -37,30 +37,29 @@ class CoursesSee {
     });
   }
 
-  void acceptSseClient(SseConnection client) {
+  void _accept(SseConnection client) {
     print('Accepted SSE client [${incomings.first}]');
     clients[incomings.first] = client;
     incomings.remove(incomings.first);
     client.stream.listen(print, onDone: () {
-      closeSseClient(client);
+      close(client);
     }, onError: (Object e) {
-      closeSseClient(client);
+      close(client);
     }, cancelOnError: true);
   }
 
-  void listenSseClients(SseHandler sse) async {
+  void listen(SseHandler sse) async {
     print('Listen SSE clients');
     while (await sse.connections.hasNext) {
-      var client = await sse.connections.next;
-      acceptSseClient(client);
+      _accept(await sse.connections.next);
     }
   }
 
-  void advertiseOthers(String payload) {
+  void push(String payload) {
     clients.forEach((id, client) {
       client.sink.add(payload);
     });
   }
 }
 
-var courses_sse = CoursesSee();
+final courses_sse = CoursesSse();
