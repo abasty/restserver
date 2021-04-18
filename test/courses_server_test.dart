@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
-import 'package:restserver/courses_sse_client.dart';
+import 'courses_sse_client.dart' show SseClient;
 
 const host = 'localhost:8067';
 
