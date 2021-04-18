@@ -10,7 +10,10 @@ environment:
 dependencies:
   shelf: ^1.1.0
   shelf_router: ^1.0.0
-  sse: ^3.8.3
+  sse:
+    git:
+        url: git@github.com:dart-lang/sse.git
+        ref: null_safety
 
 dev_dependencies:
   pedantic: ^1.11.0

@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'dart:async';
 
 import 'package:shelf/shelf.dart';
@@ -10,12 +8,12 @@ class CoursesSse {
   final Set<int> incomings = {};
 
   /// shelf handler to check sseClientId parameter in /sync requests
-  FutureOr<Response> checkSseClientId(request) {
+  FutureOr<Response> checkSseClientId(Request request) {
     // Check if sseClientId is valid in sync request (or else send back a
     // forbidden error response)
-    if (request.url.path == 'sync') {
+    if (request.url.path == 'sync' && request.method == 'GET') {
       var sseClientIdStr = request.url.queryParameters['sseClientId'];
-      var sseClientId = int.tryParse(sseClientIdStr ?? '-1');
+      var sseClientId = int.tryParse(sseClientIdStr ?? '-1') ?? 0;
       if (sseClientId <= 0 ||
           incomings.contains(sseClientId) ||
           clients.containsKey(sseClientId)) {

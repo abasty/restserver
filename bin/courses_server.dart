@@ -1,5 +1,3 @@
-// @dart=2.9
-
 import 'dart:async';
 import 'package:restserver/courses_sse.dart';
 import 'package:shelf/shelf.dart';

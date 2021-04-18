@@ -263,9 +263,11 @@ packages:
   sse:
     dependency: "direct main"
     description:
-      name: sse
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: null_safety
+      resolved-ref: b6255efbfa84299faf1faca77c5d8548829c10a3
+      url: "git@github.com:dart-lang/sse.git"
+    source: git
     version: "3.8.3"
   stack_trace:
     dependency: transitive
