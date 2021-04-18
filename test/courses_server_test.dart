@@ -50,43 +50,60 @@ void main() {
   });
 
   test('SseClient', () async {
+    const sse_url = 'http://$host/sync';
     var produit = {};
     var client;
+    var client2;
     var data = <String>[];
     try {
-      client = SseClient(
-        'http://localhost:8067/sync',
-      )..stream.listen((event) {
-          data.add(event);
-        }, cancelOnError: true);
+      /// Création de deux clients SSE
+      client = SseClient(sse_url)
+        ..stream.listen((event) => data.add(event), cancelOnError: true);
       await client.onConnected;
-      // Demande la liste des produits et sélectionne le premier
+      client2 = SseClient(sse_url)
+        ..stream.listen((event) => data.add(event), cancelOnError: true);
+      await client2.onConnected;
+
+      /// Demande un serveur la liste de produits et on sélectionne le premier
       var produits = await fetchData('courses/produits');
       assert(produits is List);
       produits = produits as List;
       assert(produits.isNotEmpty);
       assert(produits[0] is Map<String, dynamic>);
+
+      /// [produit] contient le premier produit, on fixe sa quantité
       produit = produits[0] as Map<String, dynamic>;
+      produit['quantite'] = 42;
     } on Exception {
       print('Connexion impossible');
       assert(false);
     }
-    // Poste le produit sélectionné
+
+    /// Poste le produit sélectionné avec sa quanité modifiée
     var response = await http.post(
       Uri.http(host, 'courses/produit'),
       body: json.encode(produit),
     );
     assert(response.statusCode == 200);
+
+    /// Les clients SSe doivent avoir reçu le produit modifié
+    var count = 0;
     data.forEach((str) {
       if (str.startsWith('data: ')) {
-        // Vérifie que le produit retourné a le même nom
+        /// Vérifie que le produit retourné a le même nom
         var produit_ret = json
             .decode(str.substring(7, str.length - 1).replaceAll('\\"', '"'));
-        // print(produit_ret);
+
+        /// print(produit_ret);
         assert(produit_ret is Map<String, dynamic>);
         produit_ret = produit_ret as Map<String, dynamic>;
         assert(produit['nom'] == produit_ret['nom']);
+        assert(produit_ret['quantite'] == 42);
+        count++;
       }
     });
+
+    /// Les deux clients doivent avoir reçu un message SSE
+    assert(count == 2);
   });
 }
