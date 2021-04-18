@@ -28,18 +28,19 @@ class CoursesSee {
 
   /// close SSE client and remove it from clients list
   void closeSseClient(SseConnection client) {
-    clients.removeWhere((key, value) => client == value);
-    print('Close SSE Client [${client.hashCode}]');
+    clients.removeWhere((key, value) {
+      if (value == client) {
+        print('Close SSE Client [$key]');
+        return true;
+      }
+      return false;
+    });
   }
 
   void acceptSseClient(SseConnection client) {
-    // On place les clients dans un tableau, sur error ou done on les vire. Sur
-    // data on propage la data sur les autres.
-    print('Accepted new SSE client [${client.hashCode}]');
+    print('Accepted SSE client [${incomings.first}]');
     clients[incomings.first] = client;
     incomings.remove(incomings.first);
-    // print(incomings);
-    // print(clients);
     client.stream.listen(print, onDone: () {
       closeSseClient(client);
     }, onError: (Object e) {
@@ -57,7 +58,6 @@ class CoursesSee {
 
   void advertiseOthers(String payload) {
     clients.forEach((id, client) {
-      // print('$id');
       client.sink.add(payload);
     });
   }
