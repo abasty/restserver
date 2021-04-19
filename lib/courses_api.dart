@@ -6,24 +6,33 @@ import 'package:shelf_router/shelf_router.dart';
 
 import 'mapdb.dart';
 
+const content_headers = {
+  'Content-Type': 'application/json; charset=utf-8',
+};
+
 class CoursesApi {
   Router get router {
     final router = Router();
 
     router.get('/all', (Request request) {
-      // print(request.headers['mon-header']);
-      return Response.ok(json.encode(db.data),
-          headers: {'Content-Type': 'application/json'});
+      return Response.ok(
+        json.encode(db.data),
+        headers: content_headers,
+      );
     });
 
     router.get('/rayons', (Request request) {
-      return Response.ok(json.encode(db.data['rayons']),
-          headers: {'Content-Type': 'application/json'});
+      return Response.ok(
+        json.encode(db.data['rayons']),
+        headers: content_headers,
+      );
     });
 
     router.get('/produits', (Request request) {
-      return Response.ok(json.encode(db.data['produits']),
-          headers: {'Content-Type': 'application/json'});
+      return Response.ok(
+        json.encode(db.data['produits']),
+        headers: content_headers,
+      );
     });
 
     router.post('/produit', (Request request) async {

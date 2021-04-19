@@ -66,7 +66,7 @@ void main() {
         ..stream.listen((event) => data.add(event), cancelOnError: true);
       await client2.onConnected;
 
-      /// Demande un serveur la liste de produits et on sélectionne le premier
+      /// Demande au serveur la liste de produits et on sélectionne le premier
       var produits = await fetchData('courses/produits');
       assert(produits is List);
       produits = produits as List;
@@ -82,7 +82,7 @@ void main() {
       assert(false);
     }
 
-    /// Poste le produit sélectionné avec sa quanité modifiée
+    /// Poste le produit sélectionné avec sa quantité modifiée
     var response = await http.post(
       Uri.http(host, 'courses/produit'),
       body: json.encode(produit),
