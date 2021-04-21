@@ -36,12 +36,9 @@ class CoursesApi {
     });
 
     router.post('/produit', (Request request) async {
-      final payload = await request.readAsString();
-      // print('payload: $payload');
-      // TODO: Protect the decode(), the as int and merge it to database
-      var map = json.decode(payload);
-      var sseClientId = int.tryParse(map['sseClientId'] ?? '-1') ?? 0;
-      courses_sse.push(payload, sseClientId);
+      // TODO: Protect the decode(), and merge it to database
+      // var map = json.decode(payload);
+      courses_sse.push(request);
       return Response.ok('');
     });
 

@@ -54,7 +54,10 @@ class CoursesSse {
     }
   }
 
-  void push(String payload, int clientId) {
+  void push(Request request) async {
+    final payload = await request.readAsString();
+    final clientIdStr = request.requestedUri.queryParameters['sseClientId'];
+    final clientId = int.tryParse(clientIdStr ?? '-1') ?? 0;
     clients.forEach((id, client) {
       if (clientId != id) {
         client.sink.add(payload);
