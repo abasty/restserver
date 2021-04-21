@@ -38,7 +38,10 @@ class CoursesApi {
     router.post('/produit', (Request request) async {
       // TODO: Protect the decode(), and merge it to database
       // var map = json.decode(payload);
-      courses_sse.push(request);
+      final payload = await request.readAsString();
+      final clientIdStr = request.requestedUri.queryParameters['sseClientId'];
+      final clientId = int.tryParse(clientIdStr ?? '-1') ?? 0;
+      courses_sse.push(payload, clientId);
       return Response.ok('');
     });
 

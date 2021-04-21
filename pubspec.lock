@@ -64,6 +64,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.0"
+  courses_sse_client:
+    dependency: "direct dev"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: a357cda1ee041b5fdeb13bff262af9835f768582
+      url: "git@github.com:abasty/courses_sse_client.git"
+    source: git
+    version: "1.0.0"
   coverage:
     dependency: transitive
     description:
