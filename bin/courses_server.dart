@@ -24,14 +24,13 @@ final corsHeaders = createMiddleware(
 Future<void> main() async {
   db = MapDb('assets/courses.json');
 
-  final api = Router();
-  api.mount('/courses/', CoursesApi().router);
+  final courses_api = Router();
+  courses_api.mount('/courses/', CoursesApi().router);
 
   final sse = SseHandler(Uri.parse('/sync'));
   courses_sse.listen(sse);
 
-  final cascade =
-      Cascade().add(api).add(courses_sse.checkSseClientId).add(sse.handler);
+  final cascade = Cascade().add(courses_api).add(courses_sse).add(sse.handler);
 
   final pipeline = const Pipeline()
       .addMiddleware(logRequests())
