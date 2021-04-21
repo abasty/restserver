@@ -15,9 +15,15 @@ const cors_headers = {
 };
 
 final corsHeaders = createMiddleware(
-    requestHandler: (request) => request.method == 'OPTIONS'
-        ? Response.ok(null, headers: cors_headers)
-        : null,
+    requestHandler: (request) {
+      if (request.method == 'OPTIONS' &&
+          !request.url.toString().startsWith('sync')) {
+        print(request.url);
+        return Response.ok(null, headers: cors_headers);
+      } else {
+        return null;
+      }
+    },
     responseHandler: (response) => response.change(headers: cors_headers));
 
 Future<void> main() async {

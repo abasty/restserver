@@ -47,15 +47,19 @@ class CoursesSse {
   }
 
   void listen(SseHandler sse) async {
+    // TODO: convert to logger
     print('Listen SSE clients');
     while (await sse.connections.hasNext) {
       _accept(await sse.connections.next);
     }
   }
 
-  void push(String payload) {
+  void push(String payload, int clientId) {
     clients.forEach((id, client) {
-      client.sink.add(payload);
+      if (clientId != id) {
+        client.sink.add(payload);
+        print('from: $clientId, to: $id');
+      }
     });
   }
 }
