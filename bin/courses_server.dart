@@ -1,11 +1,12 @@
 import 'dart:async';
-import 'package:restserver/courses_sse.dart';
+
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
 import 'package:sse/server/sse_handler.dart';
 
 import 'package:restserver/courses_api.dart';
+import 'package:restserver/courses_sse.dart';
 import 'package:restserver/mapdb.dart';
 
 const cors_headers = {
@@ -15,15 +16,9 @@ const cors_headers = {
 };
 
 final corsHeaders = createMiddleware(
-    requestHandler: (request) {
-      if (request.method == 'OPTIONS' &&
-          !request.url.toString().startsWith('sync')) {
-        print(request.url);
-        return Response.ok(null, headers: cors_headers);
-      } else {
-        return null;
-      }
-    },
+    requestHandler: (request) => request.method == 'OPTIONS'
+        ? Response.ok(null, headers: cors_headers)
+        : null,
     responseHandler: (response) => response.change(headers: cors_headers));
 
 Future<void> main() async {
