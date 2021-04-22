@@ -50,25 +50,35 @@ void main() {
     }
   });
 
-  test('SseClient', () async {
+  test('SseClient notifications', () async {
     const sse_url = 'http://$host/sync';
     var produit = {};
-    var client;
-    var data = <String>[];
+    SseClient? client;
+    SseClient? client2;
+    SseClient? client3;
+    var notifs = <String>[];
     var quantite = 0;
     try {
-      client = SseClient.getInstance(sse_url)
-        ..stream.listen((event) => data.add(event), cancelOnError: true);
+      client = SseClient.fromUrl(sse_url)
+        ..stream.listen((event) => notifs.add(event), cancelOnError: true);
       await client.onConnected;
 
-      /// Demande au serveur la liste de produits et on sélectionne le premier
+      client2 = SseClient.fromUrl(sse_url)
+        ..stream.listen((event) => notifs.add(event), cancelOnError: true);
+      await client2.onConnected;
+
+      client3 = SseClient.fromUrl(sse_url)
+        ..stream.listen((event) => notifs.add(event), cancelOnError: true);
+      await client3.onConnected;
+
+      /// Demande au serveur la liste de produits et on sélectionne le premier.
       var produits = await fetchData('courses/produits');
       assert(produits is List);
       produits = produits as List;
       assert(produits.isNotEmpty);
       assert(produits[0] is Map<String, dynamic>);
 
-      /// [produit] contient le premier produit, on fixe sa quantité
+      /// [produit] contient le premier produit, on fixe sa quantité.
       produit = produits[0] as Map<String, dynamic>;
       quantite = Random().nextInt(100);
       produit['quantite'] = quantite;
@@ -77,14 +87,25 @@ void main() {
       assert(false);
     }
 
-    /// Poste le produit sélectionné avec sa quantité modifiée
-    var http_client = http.Client();
-    var response = await http_client.post(
-      Uri.http(host, 'courses/produit', {'sseClientId': client.clientId}),
-      body: json.encode(produit),
-    );
-    assert(response.statusCode == 200);
-    print('Vérifier que le produit est à jour sur les autres clients SSE :');
-    print(produit);
+    if (client != null && client2 != null && client3 != null) {
+      /// Poste le produit sélectionné avec sa quantité modifiée depuis le
+      /// premier client.
+      var response = await http.post(
+        Uri.http(host, 'courses/produit', {'sseClientId': client.clientId}),
+        body: json.encode(produit),
+      );
+      assert(response.statusCode == 200);
+
+      /// Attend un peu pour être sûr que le serveur a envoyé les mise à jour.
+      await Future.delayed(Duration(milliseconds: 150));
+
+      /// On a trois clients, l'initiateur ne reçoit pas la mise à jour donc
+      /// seuls deux clients doivent être notifiés.
+      assert(notifs.length == 2);
+
+      client.close();
+      client2.close();
+      client3.close();
+    }
   });
 }
