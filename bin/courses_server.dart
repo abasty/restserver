@@ -37,6 +37,6 @@ Future<void> main() async {
       .addMiddleware(corsHeaders)
       .addHandler(cascade.handler);
 
-  final server = await io.serve(pipeline, 'localhost', 8067);
+  final server = await io.serve(pipeline, '0.0.0.0', 8067);
   print('Server launched on ${server.address.address}:${server.port}');
 }
