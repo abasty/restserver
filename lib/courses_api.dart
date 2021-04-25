@@ -40,7 +40,6 @@ class CoursesApi {
       try {
         var map = json.decode(payload);
         var key = map['update'] ?? map['nom'];
-        print(key);
         if (key == null) throw TypeError;
         db.update('produits', key, map);
       } on Error {

@@ -15,7 +15,8 @@ class MapDb {
 
   void update(String collection, String nom, Map<String, dynamic> value) {
     List list = data[collection];
-    list.removeWhere((item) => item[nom] == nom);
+    list.removeWhere(
+        (item) => item['nom'] == nom || item['nom'] == value['nom']);
     list.add(value);
   }
 }
