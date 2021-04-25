@@ -7,13 +7,15 @@ late MapDb db;
 
 class MapDb {
   final DbStorageStrategy _storage;
-
   final Map<String, dynamic> data = {};
+
   MapDb(this._storage) {
-    data.addAll(_storage.load());
+    data.addAll(_storage.loadAll());
   }
 
-  Future<Map<String, dynamic>> majProduit(Map<String, dynamic> produit) async {
-    return produit;
+  void update(String collection, String nom, Map<String, dynamic> value) {
+    List list = data[collection];
+    list.removeWhere((item) => item[nom] == nom);
+    list.add(value);
   }
 }

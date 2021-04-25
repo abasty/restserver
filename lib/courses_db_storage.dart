@@ -4,17 +4,16 @@ import 'dart:io';
 import 'package:mongo_dart/mongo_dart.dart';
 
 abstract class DbStorageStrategy {
-  Map<String, dynamic> load();
+  Map<String, dynamic> loadAll();
 }
 
-class DbFileStorageStrategy implements DbStorageStrategy {
+class DbROFileStorageStrategy implements DbStorageStrategy {
   final String _name;
 
-  DbFileStorageStrategy(this._name);
+  DbROFileStorageStrategy(this._name);
 
   @override
-  Map<String, dynamic> load() {
-    // TODO: Add try / on
+  Map<String, dynamic> loadAll() {
     var str = File(_name).readAsStringSync();
     var map = json.decode(str) as Map<String, dynamic>;
     str = map['modele'] as String;
@@ -45,7 +44,7 @@ class DbMongoStorageStrategy implements DbStorageStrategy {
   }
 
   @override
-  Map<String, dynamic> load() {
+  Map<String, dynamic> loadAll() {
     // TODO: implement load
     throw UnimplementedError();
   }
