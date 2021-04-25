@@ -22,7 +22,8 @@ final corsHeaders = createMiddleware(
     responseHandler: (response) => response.change(headers: cors_headers));
 
 Future<void> main() async {
-  db = MapDb(DbROFileStorageStrategy('assets/courses.json'));
+  // db = MapDb(DbFileReadOnlyStorageStrategy('assets/courses.json'));
+  db = MapDb(DbMongoStorageStrategy());
 
   final courses_api = Router();
   courses_api.mount('/courses/', CoursesApi().router);

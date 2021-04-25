@@ -4,16 +4,16 @@ import 'dart:io';
 import 'package:mongo_dart/mongo_dart.dart';
 
 abstract class DbStorageStrategy {
-  Map<String, dynamic> loadAll();
+  Future<Map<String, dynamic>> loadAll();
 }
 
-class DbROFileStorageStrategy implements DbStorageStrategy {
+class DbFileReadOnlyStorageStrategy implements DbStorageStrategy {
   final String _name;
 
-  DbROFileStorageStrategy(this._name);
+  DbFileReadOnlyStorageStrategy(this._name);
 
   @override
-  Map<String, dynamic> loadAll() {
+  Future<Map<String, dynamic>> loadAll() async {
     var str = File(_name).readAsStringSync();
     var map = json.decode(str) as Map<String, dynamic>;
     str = map['modele'] as String;
@@ -23,29 +23,22 @@ class DbROFileStorageStrategy implements DbStorageStrategy {
 
 class DbMongoStorageStrategy implements DbStorageStrategy {
   final Db _db = Db('mongodb://localhost/courses');
-  Future<void> writeAll(Map<String, dynamic> json) async {}
 
-  Future<Map<String, dynamic>> readAll() async {
-    var map = {'rayons': [], 'produits': []};
+  @override
+  Future<Map<String, dynamic>> loadAll() async {
+    var map = <String, dynamic>{};
 
     if (!_db.isConnected) await _db.open();
 
     if (_db.isConnected) {
       var produits = _db.collection('produits');
       var rayons = _db.collection('rayons');
-
-      map = {
+      map.addAll({
         'rayons': await rayons.find().toList(),
         'produits': await produits.find().toList(),
-      };
+      });
     }
 
     return map;
-  }
-
-  @override
-  Map<String, dynamic> loadAll() {
-    // TODO: implement load
-    throw UnimplementedError();
   }
 }
