@@ -1,23 +1,19 @@
-import 'dart:convert';
-
-import 'dart:io';
+import 'courses_db_storage.dart';
 
 // FileDB
 // MongoDB
 
+late MapDb db;
+
 class MapDb {
-  final String _name;
+  final DbStorageStrategy _storage;
+
   final Map<String, dynamic> data = {};
-  MapDb(this._name) {
-    var str = File(_name).readAsStringSync();
-    final map = json.decode(str) as Map<String, dynamic>;
-    str = map['modele'] as String;
-    data.addAll(json.decode(str) as Map<String, dynamic>);
+  MapDb(this._storage) {
+    data.addAll(_storage.load());
   }
 
   Future<Map<String, dynamic>> majProduit(Map<String, dynamic> produit) async {
     return produit;
   }
 }
-
-late MapDb db;

@@ -1,13 +1,13 @@
 import 'dart:async';
 
+import 'package:restserver/courses_api.dart';
+import 'package:restserver/courses_db_storage.dart';
+import 'package:restserver/courses_sse.dart';
+import 'package:restserver/mapdb.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
 import 'package:sse/server/sse_handler.dart';
-
-import 'package:restserver/courses_api.dart';
-import 'package:restserver/courses_sse.dart';
-import 'package:restserver/mapdb.dart';
 
 const cors_headers = {
   'Access-Control-Allow-Origin': '*',
@@ -22,7 +22,7 @@ final corsHeaders = createMiddleware(
     responseHandler: (response) => response.change(headers: cors_headers));
 
 Future<void> main() async {
-  db = MapDb('assets/courses.json');
+  db = MapDb(DbFileStorageStrategy('assets/courses.json'));
 
   final courses_api = Router();
   courses_api.mount('/courses/', CoursesApi().router);
