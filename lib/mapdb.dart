@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'dart:io';
 
-// FileStorage
-// MongoDBStorage
+// FileDB
+// MongoDB
 
 class MapDb {
   final String _name;
