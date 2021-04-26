@@ -2,14 +2,14 @@ import 'courses_db_storage.dart';
 
 const IDKey = 'nom';
 
-late MapDb db;
+late CacheDb db;
 
-class MapDb {
-  final DbStorageStrategy _storage;
+class CacheDb {
+  final DbAdaptor _storage;
   final Map<String, dynamic> data = {};
   late Future<void> _isLoaded;
 
-  MapDb(this._storage) {
+  CacheDb(this._storage) {
     _isLoaded = loadAll();
   }
 
@@ -21,9 +21,13 @@ class MapDb {
   }
 
   void update(String collection, String ID, Map<String, dynamic> value) {
+    /// Met à jour le cache
     List list = data[collection];
     list.removeWhere(
         (item) => item[IDKey] == ID || item[IDKey] == value[IDKey]);
     list.add(value);
+
+    /// Met à jour [_storage]
+    _storage.update(collection, ID, value);
   }
 }

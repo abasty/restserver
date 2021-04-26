@@ -3,14 +3,16 @@ import 'dart:io';
 
 import 'package:mongo_dart/mongo_dart.dart';
 
-abstract class DbStorageStrategy {
+abstract class DbAdaptor {
   Future<Map<String, dynamic>> loadAll();
+
+  void update(String collection, String ID, Map<String, dynamic> value) {}
 }
 
-class DbFileReadOnlyStorageStrategy implements DbStorageStrategy {
+class DbFileReadOnlyAdaptor implements DbAdaptor {
   final String _name;
 
-  DbFileReadOnlyStorageStrategy(this._name);
+  DbFileReadOnlyAdaptor(this._name);
 
   @override
   Future<Map<String, dynamic>> loadAll() async {
@@ -19,9 +21,14 @@ class DbFileReadOnlyStorageStrategy implements DbStorageStrategy {
     str = map['modele'] as String;
     return json.decode(str) as Map<String, dynamic>;
   }
+
+  @override
+  void update(String collection, String ID, Map<String, dynamic> value) {
+    // TODO: implement update
+  }
 }
 
-class DbMongoStorageStrategy implements DbStorageStrategy {
+class DbMongoAdaptor implements DbAdaptor {
   final Db _db = Db('mongodb://localhost/courses');
 
   @override
@@ -40,5 +47,10 @@ class DbMongoStorageStrategy implements DbStorageStrategy {
     }
 
     return map;
+  }
+
+  @override
+  void update(String collection, String ID, Map<String, dynamic> value) {
+    // TODO: implement update
   }
 }
