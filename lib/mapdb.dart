@@ -1,7 +1,5 @@
 import 'courses_db_storage.dart';
 
-const IDKey = 'nom';
-
 late CacheDb db;
 
 class CacheDb {

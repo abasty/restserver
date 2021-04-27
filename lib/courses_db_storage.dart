@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:mongo_dart/mongo_dart.dart';
 
+const IDKey = 'nom';
+
 abstract class DbAdaptor {
   Future<Map<String, dynamic>> loadAll();
 
@@ -29,7 +31,9 @@ class DbFileReadOnlyAdaptor implements DbAdaptor {
 }
 
 class DbMongoAdaptor implements DbAdaptor {
-  final Db _db = Db('mongodb://localhost/courses');
+  final Db _db;
+
+  DbMongoAdaptor(String Uri) : _db = Db(Uri);
 
   @override
   Future<Map<String, dynamic>> loadAll() async {
@@ -38,6 +42,9 @@ class DbMongoAdaptor implements DbAdaptor {
     if (!_db.isConnected) await _db.open();
 
     if (_db.isConnected) {
+      // TODO: parler de la logique métier, on pourrait faire un select sur le
+      // stock. Montrer comment avec compass on peut rajouter des rayons ou
+      // supprimer des produits
       var produits = _db.collection('produits');
       var rayons = _db.collection('rayons');
       map.addAll({
