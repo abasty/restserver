@@ -8,7 +8,7 @@ const IDKey = 'nom';
 abstract class DbAdaptor {
   Future<Map<String, dynamic>> loadAll();
 
-  void update(String collection, String ID, Map<String, dynamic> value) {}
+  void update(String collection, String ID, Map<String, dynamic> value);
 }
 
 class DbFileReadOnlyAdaptor implements DbAdaptor {
@@ -26,12 +26,14 @@ class DbFileReadOnlyAdaptor implements DbAdaptor {
 
   @override
   void update(String collection, String ID, Map<String, dynamic> value) {
-    // TODO: implement update
+    // Ne rien faire (read only)
   }
 }
 
 class DbMongoAdaptor implements DbAdaptor {
   final Db _db;
+  late final DbCollection _rayons;
+  late final DbCollection _produits;
 
   DbMongoAdaptor(String Uri) : _db = Db(Uri);
 
@@ -45,11 +47,11 @@ class DbMongoAdaptor implements DbAdaptor {
       // TODO: parler de la logique métier, on pourrait faire un select sur le
       // stock. Montrer comment avec compass on peut rajouter des rayons ou
       // supprimer des produits
-      var produits = _db.collection('produits');
-      var rayons = _db.collection('rayons');
+      _produits = _db.collection('produits');
+      _rayons = _db.collection('rayons');
       map.addAll({
-        'rayons': await rayons.find().toList(),
-        'produits': await produits.find().toList(),
+        'rayons': await _rayons.find().toList(),
+        'produits': await _produits.find().toList(),
       });
     }
 
@@ -57,7 +59,16 @@ class DbMongoAdaptor implements DbAdaptor {
   }
 
   @override
-  void update(String collection, String ID, Map<String, dynamic> value) {
-    // TODO: implement update
+  void update(String collection, String ID, Map<String, dynamic> value) async {
+    await _produits.deleteOne({IDKey: ID});
+    await _produits.deleteOne({IDKey: value[IDKey]});
+    await _produits.insertOne({
+      IDKey: ID,
+      'rayon': {
+        'nom': value['rayon']['nom'],
+      },
+      'quantite': value['quantite'],
+      'fait': value['fait'],
+    });
   }
 }
