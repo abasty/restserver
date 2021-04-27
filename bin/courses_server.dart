@@ -15,7 +15,7 @@ const cors_headers = {
   'Access-Control-Allow-Headers': '*',
 };
 
-final corsHeaders = createMiddleware(
+final cors = createMiddleware(
     requestHandler: (request) => request.method == 'OPTIONS'
         ? Response.ok(null, headers: cors_headers)
         : null,
@@ -36,7 +36,7 @@ Future<void> main() async {
 
   final pipeline = const Pipeline()
       .addMiddleware(logRequests())
-      .addMiddleware(corsHeaders)
+      .addMiddleware(cors)
       .addHandler(cascade.handler);
 
   final server = await io.serve(pipeline, '0.0.0.0', 8067);
