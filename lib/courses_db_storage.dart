@@ -18,10 +18,15 @@ class DbFileReadOnlyAdaptor implements DbAdaptor {
 
   @override
   Future<Map<String, dynamic>> loadAll() async {
-    var str = File(_name).readAsStringSync();
-    var map = json.decode(str) as Map<String, dynamic>;
-    str = map['modele'] as String;
-    return json.decode(str) as Map<String, dynamic>;
+    try {
+      var str = await File(_name).readAsString();
+      var map = json.decode(str) as Map<String, dynamic>;
+      str = map['modele'] as String;
+      return json.decode(str) as Map<String, dynamic>;
+    } catch (e) {
+      print(e);
+      return {};
+    }
   }
 
   @override
