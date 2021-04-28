@@ -36,35 +36,46 @@ class DbFileReadOnlyAdaptor implements DbAdaptor {
 }
 
 class DbMongoAdaptor implements DbAdaptor {
-  final Db _db;
+  final String _uri;
+  late final Db _db;
+  late Future _isOpen;
   late final DbCollection _rayons;
   late final DbCollection _produits;
 
-  DbMongoAdaptor(String Uri) : _db = Db(Uri);
+  DbMongoAdaptor(this._uri) {
+    _isOpen = _init();
+  }
+
+  Future _init() async {
+    if (_uri.contains('+srv')) {
+      _db = await Db.create(_uri);
+    } else {
+      _db = Db(_uri);
+    }
+    await _db.open();
+  }
 
   @override
   Future<Map<String, dynamic>> loadAll() async {
+    await _isOpen;
+
     var map = <String, dynamic>{};
-
-    if (!_db.isConnected) await _db.open();
-
-    if (_db.isConnected) {
-      // TODO: parler de la logique métier, on pourrait faire un select sur le
-      // stock. Montrer comment avec compass on peut rajouter des rayons ou
-      // supprimer des produits
-      _produits = _db.collection('produits');
-      _rayons = _db.collection('rayons');
-      map.addAll({
-        'rayons': await _rayons.find().toList(),
-        'produits': await _produits.find().toList(),
-      });
-    }
+    // TODO: parler de la logique métier, on pourrait faire un select sur le
+    // stock. Montrer comment avec compass on peut rajouter des rayons ou
+    // supprimer des produits
+    _produits = _db.collection('produits');
+    _rayons = _db.collection('rayons');
+    map.addAll({
+      'rayons': await _rayons.find().toList(),
+      'produits': await _produits.find().toList(),
+    });
 
     return map;
   }
 
   @override
   void update(String collection, String ID, Map<String, dynamic> value) async {
+    await _isOpen;
     await _produits.deleteOne({IDKey: ID});
     await _produits.deleteOne({IDKey: value[IDKey]});
     await _produits.insertOne({
