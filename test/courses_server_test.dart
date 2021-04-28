@@ -8,6 +8,7 @@ import 'package:test/test.dart';
 import 'package:courses_sse_client/courses_sse_client.dart' show SseClient;
 
 const host = 'localhost:8067';
+const sse_url = 'http://$host/sync';
 
 Future<Object> fetchData(String uri) async {
   var response = await http.get(Uri.http(host, uri));
@@ -50,8 +51,36 @@ void main() {
     }
   });
 
+  test('API POST /courses/produit', () async {
+    try {
+      var produit = {
+        'nom': 'TEST 3',
+        'rayon': {'nom': 'Rayon 3'},
+        'quantite': 42,
+        'fait': false
+      };
+      var client = SseClient.fromUrl(sse_url)
+        ..stream.listen((event) {}, cancelOnError: true);
+      await client.onConnected;
+      var response = await http.post(
+        Uri.http(host, 'courses/produit', {'sseClientId': client.clientId}),
+        body: json.encode(produit),
+      );
+      assert(response.statusCode == 200);
+      produit['update'] = produit['nom']!;
+      produit['nom'] = 'TEST 3->4';
+      response = await http.post(
+        Uri.http(host, 'courses/produit', {'sseClientId': client.clientId}),
+        body: json.encode(produit),
+      );
+      assert(response.statusCode == 200);
+    } on Exception {
+      print('Connexion impossible');
+      assert(false);
+    }
+  });
+
   test('SseClient notifications', () async {
-    const sse_url = 'http://$host/sync';
     var produit = {};
     SseClient? client;
     SseClient? client2;

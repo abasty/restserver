@@ -36,9 +36,15 @@ class CoursesApi {
     });
 
     router.post('/produit', (Request request) async {
-      // TODO: Protect the decode(), and merge it to database
-      // var map = json.decode(payload);
       final payload = await request.readAsString();
+      try {
+        var map = json.decode(payload);
+        var key = map['update'] ?? map['nom'];
+        if (key == null) throw TypeError;
+        db.update('produits', key, map);
+      } on Error {
+        return Response.notFound('');
+      }
       final clientIdStr = request.requestedUri.queryParameters['sseClientId'];
       final clientId = int.tryParse(clientIdStr ?? '-1') ?? 0;
       courses_sse.push(payload, clientId);
