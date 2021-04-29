@@ -28,7 +28,7 @@ class CoursesSse {
   void close(SseConnection client) {
     clients.removeWhere((key, value) {
       if (value == client) {
-        print('Close SSE Client [$key]');
+        print(_message('Close SSE Client $key'));
         return true;
       }
       return false;
@@ -36,7 +36,7 @@ class CoursesSse {
   }
 
   void _accept(SseConnection client) {
-    print('Accepted SSE client [${incomings.first}]');
+    print(_message('Accepted SSE client ${incomings.first}'));
     clients[incomings.first] = client;
     incomings.remove(incomings.first);
     client.stream.listen(print, onDone: () {
@@ -47,7 +47,6 @@ class CoursesSse {
   }
 
   void listen(SseHandler sse) async {
-    // TODO: convert to logger
     print('Listen SSE clients');
     while (await sse.connections.hasNext) {
       _accept(await sse.connections.next);
@@ -58,9 +57,13 @@ class CoursesSse {
     clients.forEach((id, client) {
       if (clientId != id) {
         client.sink.add(payload);
-        print('from: $clientId, to: $id');
+        print(_message('Send event to $id (from $clientId)'));
       }
     });
+  }
+
+  String _message(msg) {
+    return '${DateTime.now().toIso8601String()}  $msg';
   }
 }
 

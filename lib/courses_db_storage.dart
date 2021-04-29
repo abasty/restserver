@@ -60,9 +60,6 @@ class DbMongoAdaptor implements DbAdaptor {
     await _isOpen;
 
     var map = <String, dynamic>{};
-    // TODO: parler de la logique métier, on pourrait faire un select sur le
-    // stock. Montrer comment avec compass on peut rajouter des rayons ou
-    // supprimer des produits
     _produits = _db.collection('produits');
     _rayons = _db.collection('rayons');
     map.addAll({
