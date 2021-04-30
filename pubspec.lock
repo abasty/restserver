@@ -21,14 +21,14 @@ packages:
       name: args
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.1.0"
   async:
     dependency: transitive
     description:
       name: async
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.5.0"
+    version: "2.6.0"
   basic_utils:
     dependency: transitive
     description:
@@ -83,10 +83,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "405c3c0d8cb9e96e3d15560c2cb204e603a379bf"
+      resolved-ref: b4b2363fbbf1e33abefe834ca6a4b3088168b614
       url: "git@github.com:abasty/courses_sse_client.git"
     source: git
-    version: "1.0.0"
+    version: "1.2.0"
   coverage:
     dependency: transitive
     description:
@@ -121,7 +121,7 @@ packages:
       name: frontend_server_client
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.1.0"
   glob:
     dependency: transitive
     description:
@@ -135,7 +135,7 @@ packages:
       name: http
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.13.1"
+    version: "0.13.2"
   http_methods:
     dependency: transitive
     description:
@@ -275,14 +275,14 @@ packages:
       name: rational
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "1.1.0+1"
   shelf:
     dependency: "direct main"
     description:
       name: shelf
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   shelf_packages_handler:
     dependency: transitive
     description:
@@ -375,7 +375,7 @@ packages:
       name: test
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.17.0"
+    version: "1.17.3"
   test_api:
     dependency: transitive
     description:
@@ -389,7 +389,7 @@ packages:
       name: test_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.20"
+    version: "0.3.23"
   typed_data:
     dependency: transitive
     description:
@@ -440,4 +440,4 @@ packages:
     source: hosted
     version: "3.1.0"
 sdks:
-  dart: ">=2.12.0 <2.14.0"
+  dart: ">=2.12.0 <3.0.0"
