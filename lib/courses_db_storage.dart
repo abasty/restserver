@@ -75,13 +75,15 @@ class DbMongoAdaptor implements DbAdaptor {
     await _isOpen;
     await _produits.deleteOne({IDKey: ID});
     await _produits.deleteOne({IDKey: value[IDKey]});
-    await _produits.insertOne({
-      IDKey: ID,
-      'rayon': {
-        'nom': value['rayon']['nom'],
-      },
-      'quantite': value['quantite'],
-      'fait': value['fait'],
-    });
+    if (value['deleted'] == null) {
+      await _produits.insertOne({
+        IDKey: ID,
+        'rayon': {
+          'nom': value['rayon']['nom'],
+        },
+        'quantite': value['quantite'],
+        'fait': value['fait'],
+      });
+    }
   }
 }

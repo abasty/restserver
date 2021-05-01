@@ -23,7 +23,7 @@ class CacheDb {
     List list = data[collection];
     list.removeWhere(
         (item) => item[IDKey] == ID || item[IDKey] == value[IDKey]);
-    list.add(value);
+    if (value['deleted'] == null) list.add(value);
 
     /// Met à jour [_storage]
     _storage.update(collection, ID, value);
