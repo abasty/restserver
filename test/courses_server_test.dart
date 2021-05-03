@@ -29,9 +29,8 @@ void main() {
       assert(map.keys.length == 2);
       assert(map['rayons'] is List);
       assert(map['produits'] is List);
-    } on Exception {
-      print('Connexion impossible');
-      assert(false);
+    } catch (e) {
+      expect(true, false, reason: 'Connexion impossible');
     }
   });
 
@@ -45,9 +44,8 @@ void main() {
       var rayon = rayons[1] as Map<String, dynamic>;
       assert(rayon['nom'] != null);
       assert(rayon['nom'] == 'Boucherie');
-    } on Exception {
-      print('Connexion impossible');
-      assert(false);
+    } catch (e) {
+      expect(true, false, reason: 'Connexion impossible');
     }
   });
 
@@ -59,8 +57,7 @@ void main() {
         'quantite': 42,
         'fait': false
       };
-      var client = SseClient.fromUrl(sse_url)
-        ..stream.listen((event) {}, cancelOnError: true);
+      var client = SseClient.fromUrl(sse_url);
       await client.onConnected;
       var response = await http.post(
         Uri.http(host, 'courses/produit', {'sseClientId': client.clientId}),
@@ -74,31 +71,27 @@ void main() {
         body: json.encode(produit),
       );
       assert(response.statusCode == 200);
-    } on Exception {
-      print('Connexion impossible');
-      assert(false);
+    } catch (e) {
+      expect(true, false, reason: 'Connexion impossible');
     }
   });
 
   test('SseClient notifications', () async {
     var produit = {};
-    SseClient? client;
-    SseClient? client2;
-    SseClient? client3;
+    var client = SseClient.fromUrl(sse_url);
+    var client2 = SseClient.fromUrl(sse_url);
+    var client3 = SseClient.fromUrl(sse_url);
     var notifs = <String>[];
     var quantite = 0;
     try {
-      client = SseClient.fromUrl(sse_url)
-        ..stream.listen((event) => notifs.add(event), cancelOnError: true);
       await client.onConnected;
+      client.stream.listen((event) => notifs.add(event), cancelOnError: true);
 
-      client2 = SseClient.fromUrl(sse_url)
-        ..stream.listen((event) => notifs.add(event), cancelOnError: true);
       await client2.onConnected;
+      client2.stream.listen((event) => notifs.add(event), cancelOnError: true);
 
-      client3 = SseClient.fromUrl(sse_url)
-        ..stream.listen((event) => notifs.add(event), cancelOnError: true);
       await client3.onConnected;
+      client3.stream.listen((event) => notifs.add(event), cancelOnError: true);
 
       /// Demande au serveur la liste de produits et on sélectionne le premier.
       var produits = await fetchData('courses/produits');
@@ -111,30 +104,27 @@ void main() {
       produit = produits[0] as Map<String, dynamic>;
       quantite = Random().nextInt(100);
       produit['quantite'] = quantite;
-    } on Exception {
-      print('Connexion impossible');
-      assert(false);
+    } catch (e) {
+      expect(true, false, reason: 'Connexion impossible');
     }
 
-    if (client != null && client2 != null && client3 != null) {
-      /// Poste le produit sélectionné avec sa quantité modifiée depuis le
-      /// premier client.
-      var response = await http.post(
-        Uri.http(host, 'courses/produit', {'sseClientId': client.clientId}),
-        body: json.encode(produit),
-      );
-      assert(response.statusCode == 200);
+    /// Poste le produit sélectionné avec sa quantité modifiée depuis le
+    /// premier client.
+    var response = await http.post(
+      Uri.http(host, 'courses/produit', {'sseClientId': client.clientId}),
+      body: json.encode(produit),
+    );
+    assert(response.statusCode == 200);
 
-      /// Attend un peu pour être sûr que le serveur a envoyé les mise à jour.
-      await Future.delayed(Duration(milliseconds: 150));
+    /// Attend un peu pour être sûr que le serveur a envoyé les mise à jour.
+    await Future.delayed(Duration(milliseconds: 150));
 
-      /// On a trois clients, l'initiateur ne reçoit pas la mise à jour donc
-      /// seuls deux clients doivent être notifiés.
-      assert(notifs.length == 2);
+    /// On a trois clients, l'initiateur ne reçoit pas la mise à jour donc
+    /// seuls deux clients doivent être notifiés.
+    assert(notifs.length == 2);
 
-      client.close();
-      client2.close();
-      client3.close();
-    }
+    client.close();
+    client2.close();
+    client3.close();
   });
 }
