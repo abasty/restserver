@@ -131,12 +131,12 @@ void main() async {
     /// Poste le produit sélectionné avec sa quantité modifiée depuis le
     /// premier client.
     var response = await http.post(
-      Uri.http(host_url, 'courses/produit', {'sseClientId': client.clientId}),
+      Uri.https(host_url, 'courses/produit', {'sseClientId': client.clientId}),
       body: json.encode(produit),
     );
     assert(response.statusCode == 200);
 
-    /// Attend un peu pour être sûr que le serveur a envoyé les mise à jour.
+    /// Attend un peu pour être sûr que le serveur a envoyé les mises à jour.
     await Future.delayed(Duration(milliseconds: 150));
 
     /// On a trois clients, l'initiateur ne reçoit pas la mise à jour donc
