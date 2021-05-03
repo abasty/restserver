@@ -63,5 +63,5 @@ Future<void> main(List<String> args) async {
       .addHandler(cascade.handler);
 
   final server = await io.serve(pipeline, options['host'], port);
-  print('Server launched on ${server.address.address}:${server.port}');
+  print('Server launched on http://${server.address.address}:${server.port}');
 }
