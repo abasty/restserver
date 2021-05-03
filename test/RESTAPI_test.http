@@ -1,7 +1,7 @@
-GET http://localhost:8067/courses/all
+GET https://localhost:8067/courses/all
 ###
-GET http://localhost:8067/courses/rayons
+GET https://localhost:8067/courses/rayons
 ###
-GET http://localhost:8067/courses/produits
+GET https://localhost:8067/courses/produits
 ###
-GET http://localhost:8067/sync
+GET https://localhost:8067/sync

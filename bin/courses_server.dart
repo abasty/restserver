@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:path/path.dart' as path;
 import 'package:restserver/courses_api.dart';
 import 'package:restserver/courses_db_storage.dart';
 import 'package:restserver/courses_sse.dart';
@@ -22,6 +23,9 @@ final cors = createMiddleware(
         ? Response.ok(null, headers: cors_headers)
         : null,
     responseHandler: (response) => response.change(headers: cors_headers));
+
+String certificateChain = 'server_chain.pem';
+String serverKey = 'server_key.pem';
 
 Future<void> main(List<String> args) async {
   var parser = ArgParser();
@@ -62,6 +66,12 @@ Future<void> main(List<String> args) async {
       .addMiddleware(cors)
       .addHandler(cascade.handler);
 
-  final server = await io.serve(pipeline, options['host'], port);
-  print('Server launched on http://${server.address.address}:${server.port}');
+  Directory.current = path.dirname(Platform.script.toFilePath());
+  var serverContext = SecurityContext();
+  serverContext.useCertificateChain(certificateChain);
+  serverContext.usePrivateKey(serverKey, password: 'dartdart');
+
+  final server = await io.serve(pipeline, options['host'], port,
+      securityContext: serverContext);
+  print('Server launched on https://${server.address.address}:${server.port}');
 }

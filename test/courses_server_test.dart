@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:courses_sse_client/courses_sse_client.dart' show SseClient;
@@ -13,8 +14,18 @@ const host = 'localhost';
 const host_url = '$host:$port';
 const sse_url = 'http://$host_url/sync';
 
+// HttpOverrides
+class DevHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 Future<Object> fetchData(String uri) async {
-  var response = await http.get(Uri.http(host_url, uri));
+  var response = await http.get(Uri.https(host_url, uri));
   if (response.statusCode == 200) {
     return json.decode(response.body) as Object;
   } else {
@@ -23,6 +34,7 @@ Future<Object> fetchData(String uri) async {
 }
 
 void main() async {
+  HttpOverrides.global = DevHttpOverrides();
   await server.main(['--host', host, '--port', port]);
 
   test('API GET /courses/all', () async {
@@ -65,14 +77,16 @@ void main() async {
       var client = SseClient.fromUrl(sse_url);
       await client.onConnected;
       var response = await http.post(
-        Uri.http(host_url, 'courses/produit', {'sseClientId': client.clientId}),
+        Uri.https(
+            host_url, 'courses/produit', {'sseClientId': client.clientId}),
         body: json.encode(produit),
       );
       assert(response.statusCode == 200);
       produit['update'] = produit['nom']!;
       produit['nom'] = 'TEST 3->4';
       response = await http.post(
-        Uri.http(host_url, 'courses/produit', {'sseClientId': client.clientId}),
+        Uri.https(
+            host_url, 'courses/produit', {'sseClientId': client.clientId}),
         body: json.encode(produit),
       );
       assert(response.statusCode == 200);
