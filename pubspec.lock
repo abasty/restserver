@@ -83,10 +83,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "63f6531f3b5199bc9644e51e9eefb42d681eae22"
+      resolved-ref: e739be77355788b34d8cb4a36461656862ac36d7
       url: "git@github.com:abasty/courses_sse_client.git"
     source: git
-    version: "1.4.0"
+    version: "1.4.1"
   coverage:
     dependency: transitive
     description:
