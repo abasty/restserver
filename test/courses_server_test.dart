@@ -71,6 +71,7 @@ void main() {
         body: json.encode(produit),
       );
       assert(response.statusCode == 200);
+      client.close();
     } catch (e) {
       expect(true, false, reason: 'Connexion impossible');
     }
