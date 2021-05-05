@@ -51,12 +51,6 @@ class CoursesApi {
       return Response.ok('');
     });
 
-    router.delete('/<id>', (Request request, String id) {
-      // final parsedId = int.tryParse(id);
-      // data.removeWhere((film) => film['id'] == parsedId);
-      return Response.ok('Deleted.');
-    });
-
     print('Registered Courses REST API');
     return router;
   }
