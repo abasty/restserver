@@ -2,16 +2,19 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:courses_sse_client/courses_sse_client.dart' show SseClient;
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
-import 'package:courses_sse_client/courses_sse_client.dart' show SseClient;
+import '../bin/courses_server.dart' as server;
 
-const host = 'localhost:8067';
-const sse_url = 'http://$host/sync';
+const port = '8026';
+const host = 'localhost';
+const host_url = '$host:$port';
+const sse_url = 'http://$host_url/sync';
 
 Future<Object> fetchData(String uri) async {
-  var response = await http.get(Uri.http(host, uri));
+  var response = await http.get(Uri.http(host_url, uri));
   if (response.statusCode == 200) {
     return json.decode(response.body) as Object;
   } else {
@@ -19,7 +22,9 @@ Future<Object> fetchData(String uri) async {
   }
 }
 
-void main() {
+void main() async {
+  await server.main(['--host', host, '--port', port]);
+
   test('API GET /courses/all', () async {
     try {
       var map = await fetchData('courses/all');
@@ -60,14 +65,14 @@ void main() {
       var client = SseClient.fromUrl(sse_url);
       await client.onConnected;
       var response = await http.post(
-        Uri.http(host, 'courses/produit', {'sseClientId': client.clientId}),
+        Uri.http(host_url, 'courses/produit', {'sseClientId': client.clientId}),
         body: json.encode(produit),
       );
       assert(response.statusCode == 200);
       produit['update'] = produit['nom']!;
       produit['nom'] = 'TEST 3->4';
       response = await http.post(
-        Uri.http(host, 'courses/produit', {'sseClientId': client.clientId}),
+        Uri.http(host_url, 'courses/produit', {'sseClientId': client.clientId}),
         body: json.encode(produit),
       );
       assert(response.statusCode == 200);
@@ -112,7 +117,7 @@ void main() {
     /// Poste le produit sélectionné avec sa quantité modifiée depuis le
     /// premier client.
     var response = await http.post(
-      Uri.http(host, 'courses/produit', {'sseClientId': client.clientId}),
+      Uri.http(host_url, 'courses/produit', {'sseClientId': client.clientId}),
       body: json.encode(produit),
     );
     assert(response.statusCode == 200);
