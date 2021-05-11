@@ -13,7 +13,7 @@ dependencies:
   args:
   sse:
     git:
-        url: git@github.com:dart-lang/sse.git
+        url: https://github.com/dart-lang/sse.git
         ref: null_safety
   mongo_dart:
 
