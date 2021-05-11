@@ -83,8 +83,8 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "5eced02bd6371fadb55af732518d1060cf4159ff"
-      url: "git@github.com:abasty/courses_sse_client.git"
+      resolved-ref: "6b802ff03f9228203350cbc0d00407f9a3850b74"
+      url: "https://github.com/abasty/courses_sse_client.git"
     source: git
     version: "1.4.3"
   coverage:
