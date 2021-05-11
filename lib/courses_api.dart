@@ -38,8 +38,8 @@ class CoursesApi {
     router.post('/produit', (Request request) async {
       final payload = await request.readAsString();
       try {
-        var map = json.decode(payload);
-        var key = map['update'] ?? map['nom'];
+        var map = json.decode(payload) as Map<String, dynamic>;
+        var key = (map['update'] ?? map['nom']) as String?;
         if (key == null) throw TypeError;
         db.update('produits', key, map);
       } on Error {

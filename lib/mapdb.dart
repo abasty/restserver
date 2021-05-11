@@ -20,7 +20,7 @@ class CacheDb {
 
   void update(String collection, String ID, Map<String, dynamic> value) {
     /// Met à jour le cache
-    List list = data[collection];
+    var list = data[collection] as List;
     list.removeWhere(
         (item) => item[IDKey] == ID || item[IDKey] == value[IDKey]);
     if (value['deleted'] == null) list.add(value);

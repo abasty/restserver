@@ -35,16 +35,16 @@ Future<void> main(List<String> args) async {
   int port;
   try {
     options = parser.parse(args);
-    port = int.parse(options['port']);
+    port = int.parse(options['port'] as String);
   } catch (e) {
     print(parser.usage);
     exit(1);
   }
 
   if (options['mode'] == 'file') {
-    db = CacheDb(DbFileReadOnlyAdaptor(options['file-path']));
+    db = CacheDb(DbFileReadOnlyAdaptor(options['file-path'] as String));
   } else {
-    db = CacheDb(DbMongoAdaptor(options['mongodb-url']));
+    db = CacheDb(DbMongoAdaptor(options['mongodb-url'] as String));
   }
   await db.isLoaded;
   print('Loaded data from ${options["mode"]}');
