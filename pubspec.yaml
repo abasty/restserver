@@ -12,9 +12,6 @@ dependencies:
   shelf_router: ^1.0.0
   args:
   sse:
-    git:
-        url: https://github.com/dart-lang/sse.git
-        ref: null_safety
   mongo_dart:
 
 dev_dependencies:
