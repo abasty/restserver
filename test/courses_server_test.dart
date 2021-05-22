@@ -3,16 +3,17 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:courses_sse_client/courses_sse_client.dart' show SseClient;
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
+
+import 'package:courses_sse_client/courses_sse_client.dart' show SseClient;
 
 import '../bin/courses_server.dart' as server;
 
 const port = '8026';
 const host = 'localhost';
 const host_url = '$host:$port';
-const sse_url = 'http://$host_url/sync';
+const sse_url = 'https://$host_url/sync';
 
 // HttpOverrides
 class DevHttpOverrides extends HttpOverrides {
@@ -35,7 +36,7 @@ Future<Object> fetchData(String uri) async {
 
 void main() async {
   HttpOverrides.global = DevHttpOverrides();
-  await server.main(['--host', host, '--port', port]);
+  await server.main(['--host', host, '--port', port, '--pem', 'bin']);
 
   test('API GET /courses/all', () async {
     try {
