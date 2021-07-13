@@ -81,11 +81,9 @@ packages:
   courses_sse_client:
     dependency: "direct dev"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "65f6e00fdf99772f605106915bef25e72d1440d8"
-      url: "https://github.com/abasty/courses_sse_client.git"
-    source: git
+      path: "../courses_sse_client"
+      relative: true
+    source: path
     version: "1.4.3"
   coverage:
     dependency: transitive

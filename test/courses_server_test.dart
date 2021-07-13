@@ -11,7 +11,8 @@ import '../bin/courses_server.dart' as server;
 const port = '8026';
 const host = 'localhost';
 const host_url = '$host:$port';
-const sse_url = 'http://$host_url/sync';
+const path = '/sync';
+var uri = Uri.parse('http://$host_url');
 
 Future<Object> fetchData(String uri) async {
   var response = await http.get(Uri.http(host_url, uri));
@@ -62,7 +63,7 @@ void main() async {
         'quantite': 42,
         'fait': false
       };
-      var client = SseClient.fromUrl(sse_url);
+      var client = SseClient.fromUriAndPath(uri, path);
       await client.onConnected;
       var response = await http.post(
         Uri.http(host_url, 'courses/produit', {'sseClientId': client.clientId}),
@@ -84,9 +85,9 @@ void main() async {
 
   test('SseClient notifications', () async {
     var produit = {};
-    var client = SseClient.fromUrl(sse_url);
-    var client2 = SseClient.fromUrl(sse_url);
-    var client3 = SseClient.fromUrl(sse_url);
+    var client = SseClient.fromUriAndPath(uri, path);
+    var client2 = SseClient.fromUriAndPath(uri, path);
+    var client3 = SseClient.fromUriAndPath(uri, path);
     var notifs = <String>[];
     var quantite = 0;
     try {
