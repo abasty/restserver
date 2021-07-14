@@ -82,8 +82,8 @@ packages:
     dependency: "direct dev"
     description:
       path: "."
-      ref: HEAD
-      resolved-ref: "669a0b2f4ffdb5395220ea1de483756646ce94e9"
+      ref: ngrok
+      resolved-ref: "21ee65a03f0daec3e83ee43eb0dd74ddff03d48b"
       url: "https://github.com/abasty/courses_sse_client.git"
     source: git
     version: "1.4.3"
