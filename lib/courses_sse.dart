@@ -62,6 +62,13 @@ class CoursesSse {
     });
   }
 
+  void ping() {
+    clients.forEach((id, client) {
+      client.sink.add('ping');
+      print(_message('Send ping event to $id'));
+    });
+  }
+
   String _message(msg) {
     return '${DateTime.now().toIso8601String()}  $msg';
   }

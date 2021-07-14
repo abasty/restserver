@@ -63,5 +63,7 @@ Future<void> main(List<String> args) async {
       .addHandler(cascade.handler);
 
   final server = await io.serve(pipeline, options['host'], port);
+
+  Timer.periodic(const Duration(seconds: 30), (Timer t) => courses_sse.ping());
   print('Server launched on http://${server.address.address}:${server.port}');
 }
